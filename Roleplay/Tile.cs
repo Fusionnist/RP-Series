@@ -7,9 +7,10 @@ namespace Roleplay
 {
     public class Tile : Sprite
     {
-        public Tile(MagicTexture tex_, Vector2 pos_):base(tex_, pos_)
+        public string name;
+        public Tile(MagicTexture tex_, Vector2 pos_, string name_):base(tex_, pos_)
         {
-
+            name = name_;
         }
     }
 }

@@ -24,8 +24,8 @@ namespace Roleplay
         public Rectangle getFrame()
         {
             Rectangle rec = tex.frame;
-            rec.X += (int)pos.X;
-            rec.Y += (int)pos.Y;
+            rec.X = (int)pos.X;
+            rec.Y = (int)pos.Y;
             return rec;
         }
         public Vector2 getMiddle()

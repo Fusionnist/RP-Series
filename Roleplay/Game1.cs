@@ -35,6 +35,8 @@ namespace Roleplay
         Tileset ts;
         KeyboardState kbs;
         Button b;
+        //data
+        TileSheet sheet;
 
         //editor
         Tile currentTile;
@@ -61,6 +63,7 @@ namespace Roleplay
             rt = new RenderTarget2D(GraphicsDevice, virtDim.X, virtDim.Y);
             nonTransRt = new RenderTarget2D(GraphicsDevice, virtDim.X, virtDim.Y);
             base.Initialize();
+            sheet = new TileSheet("Content/Xml/Tiles.xml", Content);
 
             SetupKeys();
             ResizeWindow();
@@ -84,11 +87,23 @@ namespace Roleplay
         {
             tex = Content.Load<Texture2D>("tile");
             tileIndex = 0;
-            tileNames = new string[] { "tile", "tile2" };
-            currentTile = GetTile(tileNames[tileIndex]);
+            currentTile = GetTile(sheet.tiles[tileIndex]);
             ts = GetTileset();
         }
         //get
+        public int getTileIndex(string tilename_)
+        {
+            int index = 0;
+            for (int i = 0; i < sheet.tiles.Length; i++)
+            {
+                if (sheet.tiles[i] == tilename_)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
         public Tileset GetTileset()
         {
             XDocument doc = XDocument.Load("Content/Xml/TestTileset.xml");
@@ -98,29 +113,59 @@ namespace Roleplay
             Tile[,] tiles2 = new Tile[tx, ty];
             foreach (XElement tile in doc.Element("Tileset").Elements("Tile"))
             {
-                MagicTexture ttt = new MagicTexture(Content.Load<Texture2D>(tile.Value), new Rectangle(0, 0, 200, 100), Facing.N);
                 int x = int.Parse(tile.Attribute("x").Value);
                 int y = int.Parse(tile.Attribute("y").Value);
-                tiles2[x,y] = new Tile(ttt, Vector2.Zero);
+                tiles2[x, y] = GetTile(tile.Value);
             }
             
             return new Tileset(tiles2, tx, ty, 200,100);
         }
         public Tile GetTile(string tilename_)
         {
-             MagicTexture ttt = new MagicTexture(Content.Load<Texture2D>(tilename_), new Rectangle(0, 0, 200, 100), Facing.N);
-             return new Tile(ttt, Vector2.Zero);        
+             int index = getTileIndex(tilename_);
+             MagicTexture ttt = new MagicTexture(sheet.src, new Rectangle(sheet.tpos[index].X, sheet.tpos[index].Y, sheet.w, sheet.h) , Facing.N);
+             return new Tile(ttt, Vector2.Zero, tilename_);        
         }
         public Vector2 getMousePos()
         {
             return mousePos + translation * -1;
         }
+        //save
+        public void SaveTileset()
+        {
+            XElement tilesetEl = new XElement("Tileset");
+            tilesetEl.Add(new XAttribute("x", ts.width));
+            tilesetEl.Add(new XAttribute("y", ts.height));
+
+            for (int x = 0; x< ts.width; x++)
+            {
+                for (int y = 0; y < ts.height; y++)
+                {
+                    XElement tileEl = new XElement("Tile");
+
+                    string name = ts.tiles[x, y].name;
+                    tileEl.SetValue(name);
+
+                    int index = getTileIndex(name);
+                    tileEl.Add(new XAttribute("x", x));
+                    tileEl.Add(new XAttribute("y", y));
+
+                    tilesetEl.Add(tileEl);
+                }
+            }
+
+            XDocument doc = XDocument.Load("Content/Xml/TestTileset.xml");
+            doc.Element("Tileset").ReplaceWith(tilesetEl);
+            doc.Save("Content/Xml/TestTileset.xml");
+        }
         //update
         public void ToggleSelectedTile()
         {
             tileIndex++;
-            if(tileIndex >= tileNames.Length) { tileIndex = 0; }
-            currentTile = GetTile(tileNames[tileIndex]);
+            if(tileIndex >= sheet.tiles.Length)
+            { tileIndex = 0; }
+            currentTile = GetTile(sheet.tiles[tileIndex]);
+            SaveTileset();
         }
         public void UpdateKeys()
         {
@@ -201,7 +246,7 @@ namespace Roleplay
                     }
                     if (ts.tiles[closest.X, closest.Y].getFrame().Contains(getMousePos()))
                     {
-                        ts.tiles[closest.X, closest.Y] = GetTile(tileNames[tileIndex]);
+                        ts.tiles[closest.X, closest.Y] = GetTile(sheet.tiles[tileIndex]);
                         ts.PlaceTiles();
                     }
                 }                

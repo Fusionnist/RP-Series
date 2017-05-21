@@ -50,6 +50,7 @@
     <Compile Include="Sprite.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Tileset.cs" />
+    <Compile Include="TileSheet.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
@@ -117,7 +118,11 @@
     <Content Include="Content\TERA_ScreenShot_20170410_200528.png" />
     <Content Include="Content\tile.png" />
     <Content Include="Content\tile2.png" />
+    <Content Include="Content\Tiles.png" />
     <Content Include="Content\Xml\TestTileset.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Xml\Tiles.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

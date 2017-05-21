@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Tilesheet path="Tiles" w="200" h="100">
+  <Tile name="tile1" x="0" y="0"></Tile>
+  <Tile name="tile2" x="200" y="0"></Tile>
+  <Tile name="tile3" x="400" y="0"></Tile>
+</Tilesheet>
