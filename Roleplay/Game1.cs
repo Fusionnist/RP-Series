@@ -8,6 +8,7 @@ using System;
 namespace Roleplay
 {
     enum GameMode { TilesetEditor, Game, Menus }
+    enum TSEMode { Edit, Select}
     enum DrawPhase {Trans, NonTrans }
     /// <summary>
     /// This is the main type for your game.
@@ -16,9 +17,11 @@ namespace Roleplay
     {
         DrawPhase dPhase;
         GameMode gm;
-        //KEYS
-        Keys k_SaveTileset;
-        bool p_SaveTileset, pb_SaveTileset;
+
+        Keys k_TSESelect;
+        bool p_TSESelect, pb_TSESelect;
+        Keys k_TSESave;
+        bool p_TSESave, pb_TSESave;
 
         Vector2 translation;
         GraphicsDeviceManager graphics;
@@ -39,9 +42,10 @@ namespace Roleplay
         TileSheet sheet;
 
         //editor
-        Tile currentTile;
+        public Tile[] editorTiles;
         string[] tileNames;
         int tileIndex;
+        TSEMode tseMode;
 
         //setup
         public Game1()
@@ -53,7 +57,8 @@ namespace Roleplay
         }
         public void SetupKeys()
         {
-            k_SaveTileset = Keys.S;
+            k_TSESave = Keys.S;
+            k_TSESelect = Keys.E;
         }
         protected override void Initialize()
         {
@@ -85,9 +90,16 @@ namespace Roleplay
         }
         void SetupTSE()
         {
+            tseMode = TSEMode.Edit;
             tex = Content.Load<Texture2D>("tile");
             tileIndex = 0;
-            currentTile = GetTile(sheet.tiles[tileIndex]);
+            List<Tile> editorTileList = new List<Tile>();
+            for(int i = 0; i<sheet.tiles.Length; i++)
+            {
+                editorTileList.Add(GetTile(sheet.tiles[i]));
+            }
+            editorTiles = editorTileList.ToArray();
+            SetQuickAccessTiles();
             ts = GetTileset();
         }
         //get
@@ -130,6 +142,24 @@ namespace Roleplay
         {
             return mousePos + translation * -1;
         }
+        public Tile nextTile()
+        {
+            if (tileIndex + 1 >= sheet.tiles.Length)
+                return editorTiles[0];
+            else
+                return editorTiles[tileIndex + 1];
+        }
+        public Tile lastTile()
+        {
+            if (tileIndex - 1 < 0)
+                return editorTiles[sheet.tiles.Length - 1];
+            else
+                return editorTiles[tileIndex - 1];
+        }
+        public Tile currentTile()
+        {
+            return editorTiles[tileIndex];
+        }
         //save
         public void SaveTileset()
         {
@@ -159,19 +189,55 @@ namespace Roleplay
             doc.Save("Content/Xml/TestTileset.xml");
         }
         //update
+        public void SetQuickAccessTiles()
+        {           
+            currentTile().pos = new Vector2(200, 50);
+            lastTile().pos = new Vector2(100, 50);
+            nextTile().pos = new Vector2(300, 50);
+        }
+        public void SetSelectTilePos()
+        {
+            for(int i = 0; i<editorTiles.Length; i++)
+            {
+                editorTiles[i].pos = new Vector2(i * 200, 50);
+            }
+        }
         public void ToggleSelectedTile()
         {
-            tileIndex++;
             if(tileIndex >= sheet.tiles.Length)
             { tileIndex = 0; }
-            currentTile = GetTile(sheet.tiles[tileIndex]);
+            if (tileIndex < 0)
+            { tileIndex = sheet.tiles.Length - 1; }
+            SetQuickAccessTiles();
+
             SaveTileset();
+        }
+        public void ToggleEditorMode()
+        {
+            switch (tseMode)
+            {
+                case (TSEMode.Select):
+                    SetQuickAccessTiles();
+                    tseMode = TSEMode.Edit;
+                    break;
+
+                case (TSEMode.Edit):
+                    SetSelectTilePos();
+                    tseMode = TSEMode.Select;
+                    break;
+            }
+            
         }
         public void UpdateKeys()
         {
-            if (kbs.IsKeyUp(k_SaveTileset)) { pb_SaveTileset = false; }
-            if (kbs.IsKeyDown(k_SaveTileset) && !pb_SaveTileset) { pb_SaveTileset = true; p_SaveTileset = true; }
-            else if (kbs.IsKeyDown(k_SaveTileset)) { p_SaveTileset = false; }
+            //toggle TSESelect
+            if (kbs.IsKeyUp(k_TSESelect)) { pb_TSESelect = false; }
+            if (kbs.IsKeyDown(k_TSESelect) && !pb_TSESelect) { pb_TSESelect = true; p_TSESelect = true; }
+            else if (kbs.IsKeyDown(k_TSESelect)) { p_TSESelect = false; }
+            //save
+            if (kbs.IsKeyUp(k_TSESave)) { pb_TSESave = false; }
+            if (kbs.IsKeyDown(k_TSESave) && !pb_TSESave) { pb_TSESave = true; p_TSESave = true; }
+            else if (kbs.IsKeyDown(k_TSESave)) { p_TSESave = false; }
         }
         public void UpdateMouse()
         {
@@ -217,18 +283,40 @@ namespace Roleplay
             if (kbs.IsKeyDown(Keys.Left)) { translation.X += translationSpeed; }
             if (kbs.IsKeyDown(Keys.Right)) { translation.X -= translationSpeed; }
         }
-        void UpdateEditor(GameTime gt_)
+        public void UpdateTSESelect()
         {
-            UpdateTranslation();
-            if(p_SaveTileset)
+            if (p_TSESelect)
             {
-                //save
+                ToggleEditorMode();
             }
             if (IsClicking())
             {
-                bool switched = false;
-                if (currentTile.getFrame().Contains(mousePos))
+                for (int i = 0; i < editorTiles.Length; i++)
                 {
+                    if (editorTiles[i].getFrame().Contains(mousePos))
+                    {
+                        tileIndex = i;
+                        ToggleEditorMode();
+                        break;
+                    }
+                }
+            }
+        }
+        public void UpdateTSE()
+        {
+            UpdateTranslation();
+            if (IsClicking())
+            {
+                bool switched = false;
+                if (lastTile().getFrame().Contains(mousePos))
+                {
+                    tileIndex--;
+                    ToggleSelectedTile();
+                    switched = true;
+                }
+                if (nextTile().getFrame().Contains(mousePos))
+                {
+                    tileIndex++;
                     ToggleSelectedTile();
                     switched = true;
                 }
@@ -249,8 +337,28 @@ namespace Roleplay
                         ts.tiles[closest.X, closest.Y] = GetTile(sheet.tiles[tileIndex]);
                         ts.PlaceTiles();
                     }
-                }                
+                }
             }
+            if (p_TSESelect)
+            {
+                ToggleEditorMode();
+            }
+
+        }
+        void UpdateEditor(GameTime gt_)
+        {
+            switch (tseMode)
+            {
+                case (TSEMode.Edit):
+                    UpdateTSE();
+                    break;
+
+                case (TSEMode.Select):
+                    UpdateTSESelect();
+                    break;
+            }
+            if (p_TSESave) { SaveTileset(); }
+            
         }
         void UpdateMenus(GameTime gt_)
         {
@@ -283,13 +391,35 @@ namespace Roleplay
         }
 
         //draw
-        void DrawEditor()
+        void DrawTSESelect()
         {
-            if(dPhase == DrawPhase.Trans)
+            if (dPhase == DrawPhase.Trans) { }              
+            else {
+                foreach (Tile t in editorTiles) { t.Draw(spriteBatch); }
+            }
+        }
+        void DrawTSE()
+        {
+            if (dPhase == DrawPhase.Trans)
                 ts.Draw(spriteBatch);
             else {
-                currentTile.Draw(spriteBatch);
+                lastTile().Draw(spriteBatch);
+                nextTile().Draw(spriteBatch);
+                currentTile().Draw(spriteBatch);
             }
+        }
+        void DrawEditor()
+        {
+            switch (tseMode)
+            {
+                case (TSEMode.Edit):
+                    DrawTSE();
+                    break;
+
+                case (TSEMode.Select):
+                    DrawTSESelect();
+                    break;
+            }           
         }
         void DrawGame() {
             if (dPhase == DrawPhase.Trans)
