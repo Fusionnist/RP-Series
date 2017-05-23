@@ -10,6 +10,7 @@ namespace Roleplay
     enum GameMode { TilesetEditor, Game, Menus }
     enum TSEMode { Edit, Select}
     enum DrawPhase {Trans, NonTrans }
+    public enum ISODIR { UL,UR,DL,DR }
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -33,7 +34,7 @@ namespace Roleplay
         Point winDim;
         Vector2 scale;
         Vector2 rtPos, mousePos;
-        bool isReleased;
+        bool isReleased, isRightReleased;
         float translationSpeed;
         Tileset ts;
         KeyboardState kbs;
@@ -43,7 +44,6 @@ namespace Roleplay
 
         //editor
         public Tile[] editorTiles;
-        string[] tileNames;
         int tileIndex;
         TSEMode tseMode;
 
@@ -132,6 +132,57 @@ namespace Roleplay
             
             return new Tileset(tiles2, tx, ty, 200,100);
         }
+        public Tileset Expand(Tileset ts_, ISODIR dir_, int mod_)
+        {
+            if(!((ts_.tiles.GetLength(0) <= 1 || ts_.tiles.GetLength(1) <= 1) && mod_ < 0))
+            {
+                Tile[,] newTiles = null;
+                Point modder = Point.Zero;
+                int xDiff = 0; int yDiff = 0;
+                switch (dir_)
+                {
+                    case (ISODIR.DL):
+                        modder = new Point(0, 1 * mod_);
+                        yDiff = 0;
+                        break;
+                    case (ISODIR.DR):
+                        modder = new Point(1 * mod_, 0);
+                        xDiff = 0;
+                        break;
+                    case (ISODIR.UR):
+                        modder = new Point(0, 1 * mod_);
+                        yDiff = 1 * mod_;
+                        break;
+                    case (ISODIR.UL):
+                        modder = new Point(1 * mod_, 0);
+                        xDiff = 1 * mod_;
+                        break;
+                }
+                int oW, oH;
+                oW = ts_.tiles.GetLength(0);
+                oH = ts.tiles.GetLength(1);
+                newTiles = new Tile[oW + modder.X, oH + modder.Y];
+                for (int x = 0; x < oW; x++)
+                {
+                    for (int y = 0; y < oH; y++)
+                    {
+                        if (x + xDiff >= 0 && y + yDiff >= 0 && x + xDiff < oW + modder.X && y + yDiff < oH + modder.Y)
+                        {
+                            newTiles[x + xDiff, y + yDiff] = ts_.tiles[x, y];
+                        }
+                    }
+                }
+                for (int x = 0; x < oW + modder.X; x++)
+                {
+                    for (int y = 0; y < oH + modder.Y; y++)
+                    {
+                        if (newTiles[x, y] == null) { newTiles[x, y] = GetTile(sheet.tiles[tileIndex]); }
+                    }
+                }
+                return new Tileset(newTiles, oW + modder.X, oH + modder.Y, 200, 100);
+            }
+            return ts_;
+        }
         public Tile GetTile(string tilename_)
         {
              int index = getTileIndex(tilename_);
@@ -197,9 +248,14 @@ namespace Roleplay
         }
         public void SetSelectTilePos()
         {
-            for(int i = 0; i<editorTiles.Length; i++)
+            int count = 1920 / 200;
+            int y = 0; int ii = 0;
+            for (int i = 0; i < editorTiles.Length; i++)
             {
-                editorTiles[i].pos = new Vector2(i * 200, 50);
+                editorTiles[i].pos = new Vector2(ii * 200, y*100);
+                ii++;
+                if (ii > count)
+                { y++; ii = 0; }
             }
         }
         public void ToggleSelectedTile()
@@ -246,12 +302,22 @@ namespace Roleplay
             originalPos.Y *= 1 / scale.Y;
             mousePos = originalPos;            
             if (Mouse.GetState().LeftButton == ButtonState.Released) { isReleased = true; }
+            if (Mouse.GetState().RightButton == ButtonState.Released) { isRightReleased = true; }
         }
-        bool IsClicking()
+        bool IsleftClicking()
         {
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && isReleased)
             {
                 isReleased = false;
+                return true;
+            }
+            return false;
+        }
+        bool isRightClicking()
+        {
+            if (Mouse.GetState().RightButton == ButtonState.Pressed && isRightReleased)
+            {
+                isRightReleased = false;
                 return true;
             }
             return false;
@@ -289,7 +355,7 @@ namespace Roleplay
             {
                 ToggleEditorMode();
             }
-            if (IsClicking())
+            if (IsleftClicking())
             {
                 for (int i = 0; i < editorTiles.Length; i++)
                 {
@@ -305,45 +371,78 @@ namespace Roleplay
         public void UpdateTSE()
         {
             UpdateTranslation();
-            if (IsClicking())
+            bool switched = false;
+            if (lastTile().getFrame().Contains(mousePos))
             {
-                bool switched = false;
-                if (lastTile().getFrame().Contains(mousePos))
+                if (IsleftClicking())
                 {
                     tileIndex--;
                     ToggleSelectedTile();
                     switched = true;
                 }
-                if (nextTile().getFrame().Contains(mousePos))
+            }
+            if (nextTile().getFrame().Contains(mousePos))
+            {
+                if (IsleftClicking())
                 {
                     tileIndex++;
                     ToggleSelectedTile();
                     switched = true;
                 }
-                if (!switched)
+            }
+            if (!switched)
+            {
+                Point closest = new Point(0, 0);
+                float closestdist = 1000;
+                for (int x = 0; x < ts.width; x++)
                 {
-                    Point closest = new Point(0, 0);
-                    float closestdist = 1000;
-                    for (int x = 0; x < ts.width; x++)
+                    for (int y = 0; y < ts.height; y++)
                     {
-                        for (int y = 0; y < ts.height; y++)
-                        {
-                            float dist = Vector2.Distance(getMousePos(), ts.tiles[x, y].getMiddle());
-                            if (dist < closestdist) { closestdist = dist; closest = new Point(x, y); }
-                        }
+                        float dist = Vector2.Distance(getMousePos(), ts.tiles[x, y].getMiddle());
+                        if (dist < closestdist) { closestdist = dist; closest = new Point(x, y); }
                     }
-                    if (ts.tiles[closest.X, closest.Y].getFrame().Contains(getMousePos()))
+                }
+                if (ts.tiles[closest.X, closest.Y].getFrame().Contains(getMousePos()))
+                {
+                    if (IsleftClicking())
                     {
                         ts.tiles[closest.X, closest.Y] = GetTile(sheet.tiles[tileIndex]);
                         ts.PlaceTiles();
-                    }
+                    }                    
                 }
+            }
+            if (IsleftClicking())
+            {
+                if (mousePos.X + translation.X * -1 > 100)
+                {
+                    if (mousePos.Y + translation.Y * -1 > ts.tiles.GetLength(0) * 50) { ts = Expand(ts, ISODIR.DR, 1); }
+                    else { ts = Expand(ts, ISODIR.UR, 1); }
+                }
+                else
+                {
+                    if (mousePos.Y + translation.Y * -1 > ts.tiles.GetLength(0) * 50) { ts = Expand(ts, ISODIR.DL, 1); }
+                    else { ts = Expand(ts, ISODIR.UL, 1); }
+                }
+                
+            }
+            if (isRightClicking())
+            {
+                if (mousePos.X + translation.X * -1 > 100)
+                {
+                    if (mousePos.Y + translation.Y * -1 > ts.tiles.GetLength(0) * 50) { ts = Expand(ts, ISODIR.DR, -1); }
+                    else { ts = Expand(ts, ISODIR.UR, -1); }
+                }
+                else
+                {
+                    if (mousePos.Y + translation.Y * -1 > ts.tiles.GetLength(0) * 50) { ts = Expand(ts, ISODIR.DL, -1); }
+                    else { ts = Expand(ts, ISODIR.UL, -1); }
+                }
+
             }
             if (p_TSESelect)
             {
                 ToggleEditorMode();
             }
-
         }
         void UpdateEditor(GameTime gt_)
         {
@@ -362,7 +461,7 @@ namespace Roleplay
         }
         void UpdateMenus(GameTime gt_)
         {
-            if (b.getFrame().Contains(getMousePos()) && IsClicking()) { gm = GameMode.TilesetEditor; SetupTSE(); }
+            if (b.getFrame().Contains(getMousePos()) && IsleftClicking()) { gm = GameMode.TilesetEditor; SetupTSE(); }
         }
         void UpdateGame(GameTime gt_)
         {
