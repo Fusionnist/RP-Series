@@ -13,9 +13,9 @@ namespace Roleplay
             tex = tex_;
             pos = pos_;
         }
-        public void Draw(SpriteBatch sb_)
+        public void Draw(SpriteBatch sb_,float zoom_)
         {
-            tex.Draw(sb_, pos);
+            tex.Draw(sb_, pos,zoom_);
         }
         public void Update(GameTime gt_)
         {

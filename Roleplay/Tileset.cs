@@ -16,13 +16,13 @@ namespace Roleplay
             th = ty_;
             PlaceTiles();
         }
-        public void Draw(SpriteBatch sb_)
+        public void Draw(SpriteBatch sb_,float zoom_)
         {
             for(int x = 0; x<width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    tiles[x, y].Draw(sb_);
+                    tiles[x, y].Draw(sb_,zoom_);
                 }
             }
         }
@@ -33,6 +33,7 @@ namespace Roleplay
                 for (int y = 0; y < height; y++)
                 {
                     tiles[x, y].pos = new Vector2(x * 100 - y * 100, x * 50 + y * 50);
+                    tiles[x, y].tsPos = new Point(x, y);
                 }
             }
         }

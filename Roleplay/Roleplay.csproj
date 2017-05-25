@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Button.cs" />
+    <Compile Include="Entity.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="MagicTexture.cs" />
     <Compile Include="Program.cs" />
@@ -115,6 +116,7 @@
   <ItemGroup>
     <Content Include="Content\cursor.png" />
     <Content Include="Content\grad.png" />
+    <Content Include="Content\guy.png" />
     <Content Include="Content\TERA_ScreenShot_20170410_200528.png" />
     <Content Include="Content\tile.png" />
     <Content Include="Content\tile2.png" />

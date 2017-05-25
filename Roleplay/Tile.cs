@@ -5,10 +5,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Roleplay
 {
-    public class Tile : Sprite
+    public class Tile : Entity
     {
         public string name;
-        public Tile(MagicTexture tex_, Vector2 pos_, string name_):base(tex_, pos_)
+        public Tile(MagicTexture tex_, Vector2 pos_, Point tsPos_, string name_):base(tex_, pos_, tsPos_)
         {
             name = name_;
         }

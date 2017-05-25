@@ -39,11 +39,11 @@ namespace Roleplay
             if(frameTimer < 0) { frameTimer = frameTime; frameCounter++; }
             if(frameCounter >= frameCount) { frameCounter = 0; }
         }
-        public void Draw(SpriteBatch sb_, Vector2 pos_)
+        public void Draw(SpriteBatch sb_, Vector2 pos_, float zoom_)
         {
             //calculate the correct source rect
             frame = new Rectangle(sourceRect.X + frameCounter * sourceRect.Width, sourceRect.Y, sourceRect.Width, sourceRect.Height);
-            sb_.Draw(source, sourceRectangle: frame, position: pos_);
+            sb_.Draw(source, sourceRectangle: frame, position: pos_*zoom_,scale:new Vector2(zoom_));
         }
         public Vector2 getMiddle()
         {
