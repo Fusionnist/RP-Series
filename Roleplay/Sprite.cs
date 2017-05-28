@@ -6,16 +6,16 @@ namespace Roleplay
 {
     public class Sprite
     {
-        MagicTexture tex;
+        public MagicTexture tex;
         public Vector2 pos;
         public Sprite(MagicTexture tex_, Vector2 pos_)
         {
             tex = tex_;
             pos = pos_;
         }
-        public void Draw(SpriteBatch sb_,float zoom_)
+        public virtual void Draw(SpriteBatch sb_,float zoom_)
         {
-            tex.Draw(sb_, pos,zoom_);
+            tex.Draw(sb_, pos,zoom_, false);
         }
         public void Update(GameTime gt_)
         {

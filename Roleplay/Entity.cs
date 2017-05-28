@@ -11,5 +11,9 @@ namespace Roleplay
         {
             tsPos = tsPos_;
         }
+        public override void Draw(SpriteBatch sb_, float zoom_)
+        {
+            tex.Draw(sb_, pos, zoom_, true);
+        }
     }
 }
