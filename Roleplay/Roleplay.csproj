@@ -50,6 +50,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sprite.cs" />
+    <Compile Include="SpriteSheet.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Tileset.cs" />
     <Compile Include="TileSheet.cs" />
@@ -126,7 +127,7 @@
     <Content Include="Content\Xml\TestTileset.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Xml\Tiles.xml">
+    <Content Include="Content\Xml\TextureData.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

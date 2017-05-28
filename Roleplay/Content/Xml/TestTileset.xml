@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Tileset x="3" y="3">
-  <Tile x="0" y="0">tile</Tile>
-  <Tile x="1" y="0">tile</Tile>
-  <Tile x="2" y="0">tile</Tile>
-  <Tile x="0" y="1">tile</Tile>
-  <Tile x="1" y="1">tile</Tile>
-  <Tile x="2" y="1">tile</Tile>
-  <Tile x="0" y="2">tile</Tile>
-  <Tile x="1" y="2">tile</Tile>
-  <Tile x="2" y="2">tile</Tile>
+  <Tile x="0" y="0">test1</Tile>
+  <Tile x="1" y="0">test1</Tile>
+  <Tile x="2" y="0">test1</Tile>
+  <Tile x="0" y="1">test1</Tile>
+  <Tile x="1" y="1">test1</Tile>
+  <Tile x="2" y="1">test1</Tile>
+  <Tile x="0" y="2">test1</Tile>
+  <Tile x="1" y="2">test1</Tile>
+  <Tile x="2" y="2">test1</Tile>
 </Tileset>
