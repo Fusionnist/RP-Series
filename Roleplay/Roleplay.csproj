@@ -124,8 +124,10 @@
     <Content Include="Content\tile.png" />
     <Content Include="Content\tile2.png" />
     <Content Include="Content\Tiles.png" />
+    <Content Include="Content\tiles3.png" />
     <Content Include="Content\Xml\TestTileset.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Content\Xml\TextureData.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

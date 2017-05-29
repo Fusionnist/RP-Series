@@ -8,4 +8,12 @@
       <Tile name="test2"></Tile>
     </Tilesheet>
   </Textures>
+  <Textures src="tiles3" name="test2">
+    <Texture anim ="false" name="test1" fa="R" x="0" y="0" w="200" h="100"> </Texture>
+    <Texture anim ="false" name="test2" fa="R" x="200" y="0" w="200" h="100"> </Texture>
+    <Tilesheet>
+      <Tile name="test1"></Tile>
+      <Tile name="test2"></Tile>
+    </Tilesheet>
+  </Textures>
 </Root>
