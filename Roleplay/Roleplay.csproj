@@ -43,7 +43,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Button.cs" />
+    <Compile Include="Creature.cs" />
     <Compile Include="Entity.cs" />
+    <Compile Include="FontDrawer.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="KeyLogger.cs" />
     <Compile Include="MagicTexture.cs" />
@@ -116,7 +118,9 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Commands.txt" />
     <Content Include="Content\cursor.png" />
+    <Content Include="Content\font.png" />
     <Content Include="Content\grad.png" />
     <Content Include="Content\guy.png" />
     <Content Include="Content\smallguy.png" />

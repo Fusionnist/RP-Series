@@ -1,0 +1,8 @@
+﻿TilesetEditor: toggles to editor
+GameStart: starts game
+EndTurn: ends the turn
+
+//todo
+-Get actions to be an enum
+-Add functions to toggle to a specific mode
+-add xml data for everything + saving
