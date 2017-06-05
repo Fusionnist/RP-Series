@@ -1,0 +1,21 @@
+﻿bugs: editor with a no-tile sheet
+
+ABILITIES!
+
+-Range (in tiles)
+
+-type
+--projectile
+--meelee
+--instant
+
+-Trajectory
+--AOE circular (stomp)
+--Linear (arrow)
+
+-impact
+--blast (needs a radius and dmg pc) or not
+
+
+1,1 -> 3
+-2,-2

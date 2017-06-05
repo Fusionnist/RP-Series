@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Button.cs" />
     <Compile Include="Creature.cs" />
+    <Compile Include="CreatureSheet.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="FontDrawer.cs" />
     <Compile Include="Game1.cs" />
@@ -119,12 +120,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Commands.txt" />
+    <Content Include="_Memo.txt" />
     <Content Include="Content\cursor.png" />
     <Content Include="Content\font.png" />
     <Content Include="Content\grad.png" />
     <Content Include="Content\guy.png" />
     <Content Include="Content\smallguy.png" />
     <Content Include="Content\TERA_ScreenShot_20170410_200528.png" />
+    <Content Include="Content\testSheet.png" />
     <Content Include="Content\tile.png" />
     <Content Include="Content\tile2.png" />
     <Content Include="Content\Tiles.png" />

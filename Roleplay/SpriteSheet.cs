@@ -12,6 +12,7 @@ namespace Roleplay
     {
         public string name;
         public TileSheet tileSheet;
+        public CreatureSheet crSheet;
         public Texture2D sourceTex;
 
         public string[] mtexNames;
@@ -35,9 +36,27 @@ namespace Roleplay
             sourceTex = c_.Load<Texture2D>(sheetEl.Attribute("src").Value);
 
             List<string> tn = new List<string>();
-            foreach (XElement el in sheetEl.Element("Tilesheet").Elements("Tile"))
+            if(sheetEl.Element("Tilesheet") != null)
             {
-                tn.Add(el.Attribute("name").Value);
+                foreach (XElement el in sheetEl.Element("Tilesheet").Elements("Tile"))
+                {
+                    tn.Add(el.Attribute("name").Value);
+                }
+            }
+            
+
+            List<string> crn = new List<string>();
+            List<int> crhp = new List<int>();
+            List<int> crmhp = new List<int>();
+            
+            if(sheetEl.Element("Creatures") != null)
+            {
+                foreach (XElement el in sheetEl.Element("Creatures").Elements("Creature"))
+                {
+                    crn.Add(el.Attribute("name").Value);
+                    crhp.Add(int.Parse(el.Attribute("hp").Value));
+                    crmhp.Add(int.Parse(el.Attribute("maxhp").Value));
+                }
             }
 
             List<string> texNameList = new List<string>();
@@ -70,6 +89,7 @@ namespace Roleplay
 
             mtexNames = texNameList.ToArray();
             tileSheet = new TileSheet(tn.ToArray());
+            crSheet = new CreatureSheet(crhp.ToArray(), crmhp.ToArray(), crn.ToArray());
             sourceRects = ps.ToArray();
             facing = facingList.ToArray();
             isAnimated = isAnimList.ToArray();
@@ -85,6 +105,17 @@ namespace Roleplay
                         return new MagicTexture(sourceTex, sourceRects[i], facing[i], frameCount[i], frameTime[i], 0,name);
                     else
                         return new MagicTexture(sourceTex, sourceRects[i], facing[i],name);
+                }
+            }
+            return null;
+        }
+        public Creature getCreature(string name_)
+        {
+            for(int x = 0; x < crSheet.names.Length; x++)
+            {
+                if(crSheet.names[x] == name_)
+                {
+                    return new Creature(getTex(name_), Vector2.Zero, Point.Zero, crSheet.hp[x], crSheet.maxhp[x], name_);
                 }
             }
             return null;
