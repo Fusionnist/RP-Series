@@ -1,6 +1,8 @@
 ﻿TilesetEditor: toggles to editor
 GameStart: starts game
 EndTurn: ends the turn
+SelectSkill: select a skill (opens menu)
+SelectSkillKey: selects a skill for real
 
 //todo
 -Get actions to be an enum

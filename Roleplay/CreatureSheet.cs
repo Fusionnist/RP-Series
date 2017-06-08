@@ -10,14 +10,16 @@ namespace Roleplay
     {
         public int[] maxhp;
         public int[] hp;
+        public bool[] isActive;
 
         public string[] names;
 
-        public CreatureSheet(int[] hp_, int[] maxHp_, string[] names_)
+        public CreatureSheet(int[] hp_, int[] maxHp_, string[] names_, bool[] isActive_)
         {
             maxhp = maxHp_;
             hp = hp_;
             names = names_;
+            isActive = isActive_;
         }
     }
 }

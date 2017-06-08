@@ -48,14 +48,16 @@ namespace Roleplay
             List<string> crn = new List<string>();
             List<int> crhp = new List<int>();
             List<int> crmhp = new List<int>();
-            
-            if(sheetEl.Element("Creatures") != null)
+            List<bool> cra = new List<bool>();
+
+            if (sheetEl.Element("Creatures") != null)
             {
                 foreach (XElement el in sheetEl.Element("Creatures").Elements("Creature"))
                 {
                     crn.Add(el.Attribute("name").Value);
                     crhp.Add(int.Parse(el.Attribute("hp").Value));
                     crmhp.Add(int.Parse(el.Attribute("maxhp").Value));
+                    cra.Add(bool.Parse(el.Attribute("active").Value));
                 }
             }
 
@@ -89,7 +91,7 @@ namespace Roleplay
 
             mtexNames = texNameList.ToArray();
             tileSheet = new TileSheet(tn.ToArray());
-            crSheet = new CreatureSheet(crhp.ToArray(), crmhp.ToArray(), crn.ToArray());
+            crSheet = new CreatureSheet(crhp.ToArray(), crmhp.ToArray(), crn.ToArray(), cra.ToArray());
             sourceRects = ps.ToArray();
             facing = facingList.ToArray();
             isAnimated = isAnimList.ToArray();
@@ -115,7 +117,8 @@ namespace Roleplay
             {
                 if(crSheet.names[x] == name_)
                 {
-                    return new Creature(getTex(name_), Vector2.Zero, Point.Zero, crSheet.hp[x], crSheet.maxhp[x], name_);
+                    List<Skill> skills = new List<Skill>();
+                    return new Creature(getTex(name_), Vector2.Zero, Point.Zero, crSheet.hp[x], crSheet.maxhp[x], name_, skills, crSheet.isActive[x]);
                 }
             }
             return null;

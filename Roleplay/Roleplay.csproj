@@ -52,11 +52,14 @@
     <Compile Include="MagicTexture.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Skill.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="SpriteSheet.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Tileset.cs" />
     <Compile Include="TileSheet.cs" />
+    <Compile Include="Turn.cs" />
+    <Compile Include="TurnOption.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

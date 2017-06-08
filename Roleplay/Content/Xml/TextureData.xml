@@ -13,8 +13,8 @@
     <Texture anim ="false" name="jalapeno" fa="R" x="40" y="0" w="20" h="40"> </Texture>
     <Texture anim ="false" name="booperino" fa="R" x="0" y="0" w="40" h="40"> </Texture>
     <Creatures>
-      <Creature name="jalapeno" hp="5" maxhp="110"></Creature>
-      <Creature name="booperino" hp="1" maxhp="10"></Creature>
+      <Creature name="jalapeno" hp="5" maxhp="110" active="true"></Creature>
+      <Creature name="booperino" hp="1" maxhp="10" active="true"></Creature>
     </Creatures>
   </Textures>
   
