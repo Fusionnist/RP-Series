@@ -32,6 +32,5 @@ namespace Roleplay
         {
             isPlayer = false;
         }
-
     }
 }

@@ -7,23 +7,22 @@ using System;
 
 namespace Roleplay
 {
+    enum GameInputMode { ActorMenu, SkillSelect, CastSkill }
     enum GameMode { TilesetEditor, Game, Menus }
     enum TSEMode { Edit, Select}
     enum DrawPhase {Trans, NonTrans }
     public enum ISODIR { UL,UR,DL,DR }
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
+
     public class Game1 : Game
     {
         DrawPhase dPhase;
         GameMode gm;
 
-        Keys k_TSESelect;
-        bool p_TSESelect, pb_TSESelect;
-        Keys k_TSESave;
-        bool p_TSESave, pb_TSESave;
+        //keys
+        List<KeyLogger> keys;        
 
+        //cleanup
+        Creature guy, enemy;
         Vector2 translation;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -38,27 +37,46 @@ namespace Roleplay
         float translationSpeed;
         Tileset ts;
         KeyboardState kbs;
-        Button b;
+
+        //values
+        public float zoom;
         //data
-        TileSheet sheet;
+        List<SpriteSheet> sheets;
+        public int sheetIndex;
 
         //editor
         public Tile[] editorTiles;
         int tileIndex;
         TSEMode tseMode;
 
+        //game
+        List<Creature> actors;
+        int actorKey;
+        GameInputMode gim;
+        int skillKey;
+        //draw tools
+        FontDrawer fDrawer;
+
+        //general
+        List<Button> buttons;
+        
         //setup
         public Game1()
         {
             gm = GameMode.Menus;
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-        }
+            zoom = 0.5f;
+        } 
         public void SetupKeys()
         {
-            k_TSESave = Keys.S;
-            k_TSESelect = Keys.E;
+            keys = new List<KeyLogger>();
+            keys.Add(new KeyLogger(Keys.O, "unzoom"));
+            keys.Add(new KeyLogger(Keys.S, "save"));
+            keys.Add(new KeyLogger(Keys.P, "zoom"));
+            keys.Add(new KeyLogger(Keys.E, "select"));
+            keys.Add(new KeyLogger(Keys.M, "menu"));
+            keys.Add(new KeyLogger(Keys.I, "toggleSheet"));
         }
         protected override void Initialize()
         {
@@ -68,7 +86,10 @@ namespace Roleplay
             rt = new RenderTarget2D(GraphicsDevice, virtDim.X, virtDim.Y);
             nonTransRt = new RenderTarget2D(GraphicsDevice, virtDim.X, virtDim.Y);
             base.Initialize();
-            sheet = new TileSheet("Content/Xml/Tiles.xml", Content);
+            sheets = new List<SpriteSheet>();
+            sheets.Add(new SpriteSheet("Content/Xml/TextureData.xml", Content, "testAssets"));
+            sheets.Add(new SpriteSheet("Content/Xml/TextureData.xml", Content, "test"));
+            sheets.Add(new SpriteSheet("Content/Xml/TextureData.xml", Content, "test2"));
 
             SetupKeys();
             ResizeWindow();
@@ -77,10 +98,15 @@ namespace Roleplay
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            cursor = new MagicTexture(Content.Load<Texture2D>("cursor"), new Rectangle(0, 0, 100, 100), Facing.L);
+            cursor = new MagicTexture(Content.Load<Texture2D>("cursor"), new Rectangle(0, 0, 100, 100), Facing.L, string.Empty);
             tex = Content.Load<Texture2D>("grad");
-            MagicTexture test2 = new MagicTexture(tex, new Rectangle(0, 0, tex.Width, tex.Height), Facing.N);
-            b = new Button(test2, new Vector2(300, 100), "TilesetEditor");
+
+            buttons = new List<Button>();
+            
+            string str = "abcdefghijklmnopqrstuvwxyz0123456789.!?,':;() ";
+            fDrawer = new FontDrawer(Content.Load<Texture2D>("font"), 80, 100, str);
+
+            SetupMenu();
         }
         protected override void UnloadContent()
         {
@@ -88,34 +114,80 @@ namespace Roleplay
             rt.Dispose();
             nonTransRt.Dispose();
         }
-        void SetupTSE()
+        void SetupSheet()
         {
-            tseMode = TSEMode.Edit;
-            tex = Content.Load<Texture2D>("tile");
             tileIndex = 0;
             List<Tile> editorTileList = new List<Tile>();
-            for(int i = 0; i<sheet.tiles.Length; i++)
+            for (int i = 0; i < currentSheet().tileSheet.tiles.Length; i++)
             {
-                editorTileList.Add(GetTile(sheet.tiles[i]));
+                editorTileList.Add(GetTile(currentSheet().tileSheet.tiles[i], currentSheet().name));
             }
             editorTiles = editorTileList.ToArray();
             SetQuickAccessTiles();
-            ts = GetTileset();
         }
-        //get
-        public int getTileIndex(string tilename_)
+        void SetupTSE()
         {
-            int index = 0;
-            for (int i = 0; i < sheet.tiles.Length; i++)
-            {
-                if (sheet.tiles[i] == tilename_)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            return index;
+            tseMode = TSEMode.Edit;
+            TargetSheet("test");
+            SetupSheet();         
+            ts = GetTileset();
+            SetQuickAccessTiles();
+            //buttons
+            buttons.Clear();
         }
+        void SetupMenu()
+        {
+            MagicTexture test2 = new MagicTexture(tex, new Rectangle(0, 0, tex.Width, tex.Height), Facing.N, string.Empty);
+
+            buttons.Clear();
+            buttons.Add(new Button(test2, new Vector2(300, 100), "TilesetEditor"));
+            buttons.Add(new Button(test2, new Vector2(300, 300), "GameStart"));
+        }
+        void SetupGame()
+        {
+            //load saved input mode ect ect ect ect
+            gim = GameInputMode.ActorMenu;
+
+            ts = GetTileset();
+
+            TargetSheet("testAssets");
+            guy = currentSheet().getCreature("jalapeno");
+            guy.BecomePlayer();
+            guy.LearnSkill(new Skill(SkillTrajectory.Linear, 4, 10, "skill1"));
+            guy.LearnSkill(new Skill(SkillTrajectory.Linear, 5, 1, "skill2 lol"));
+            guy.tsPos = new Point(20, 20);
+            PositionToTile(guy);
+            enemy = currentSheet().getCreature("booperino");
+            enemy.LearnSkill(new Skill(SkillTrajectory.Linear, 5, 1, "skill2 lol"));
+
+            actors = new List<Creature>();
+            actors.Add(guy);
+            actors.Add(enemy);
+
+            //buttons
+            buttons.Clear();
+            CheckActorMenuButtons();
+        }
+
+        //get
+        public bool GetPressed(string name_)
+        {
+            bool b = false;
+            foreach (KeyLogger kl in keys) { if (kl.name == name_) { b = kl.isPressed(); } }
+            return b;
+        } //get news about the keys
+        Creature GetActorAtPos(Point pos)
+        {
+            foreach (Creature c in actors)
+            {
+                if (c.tsPos == pos) { return c; }
+            }
+            return null;
+        } //get actor at a specific location
+        public Creature CurrentActor()
+        {
+            return (actors[actorKey]);
+        } //get the current actor in the game
         public Tileset GetTileset()
         {
             XDocument doc = XDocument.Load("Content/Xml/TestTileset.xml");
@@ -127,7 +199,7 @@ namespace Roleplay
             {
                 int x = int.Parse(tile.Attribute("x").Value);
                 int y = int.Parse(tile.Attribute("y").Value);
-                tiles2[x, y] = GetTile(tile.Value);
+                tiles2[x, y] = GetTile(tile.Value, tile.Attribute("sheet").Value);
             }
             
             return new Tileset(tiles2, tx, ty, 200,100);
@@ -176,26 +248,27 @@ namespace Roleplay
                 {
                     for (int y = 0; y < oH + modder.Y; y++)
                     {
-                        if (newTiles[x, y] == null) { newTiles[x, y] = GetTile(sheet.tiles[tileIndex]); }
+                        if (newTiles[x, y] == null) { newTiles[x, y] = GetTile(currentSheet().tileSheet.tiles[tileIndex], currentSheet().name); }
                     }
                 }
                 return new Tileset(newTiles, oW + modder.X, oH + modder.Y, 200, 100);
             }
             return ts_;
         }
-        public Tile GetTile(string tilename_)
+        public Tile GetTile(string tilename_, string sheetName_)
         {
-             int index = getTileIndex(tilename_);
-             MagicTexture ttt = new MagicTexture(sheet.src, new Rectangle(sheet.tpos[index].X, sheet.tpos[index].Y, sheet.w, sheet.h) , Facing.N);
-             return new Tile(ttt, Vector2.Zero, tilename_);        
+            TargetSheet(sheetName_);
+            MagicTexture ttt = currentSheet().getTex(tilename_);
+
+            return new Tile(ttt, Vector2.Zero,Point.Zero, tilename_);        
         }
         public Vector2 getMousePos()
         {
-            return mousePos + translation * -1;
+            return 1/zoom * (mousePos + translation * -1);
         }
         public Tile nextTile()
         {
-            if (tileIndex + 1 >= sheet.tiles.Length)
+            if (tileIndex + 1 >= currentSheet().tileSheet.tiles.Length)
                 return editorTiles[0];
             else
                 return editorTiles[tileIndex + 1];
@@ -203,7 +276,7 @@ namespace Roleplay
         public Tile lastTile()
         {
             if (tileIndex - 1 < 0)
-                return editorTiles[sheet.tiles.Length - 1];
+                return editorTiles[currentSheet().tileSheet.tiles.Length - 1];
             else
                 return editorTiles[tileIndex - 1];
         }
@@ -211,6 +284,41 @@ namespace Roleplay
         {
             return editorTiles[tileIndex];
         }
+        public SpriteSheet currentSheet()
+        {
+            return (sheets[sheetIndex]);
+        }
+        public Point[] pointsInRange(Point p_, int i)
+        {
+            List<Point> points = new List<Point>();
+            int min = -i;
+            int max = i;
+            for(int x = min; x <= max; x++)
+            {
+                for (int y = min; y <= max; y++)
+                {
+                    if(Math.Abs(x)+ Math.Abs(y) <= i) { points.Add(new Point(x+p_.X, y+p_.Y)); }
+                    if(x==-2 && y == -2)
+                    {
+
+                    }
+                }
+            }
+            return points.ToArray();
+        }
+        public Creature[] inRangeActors(Point[] p_)
+        {
+            List<Creature> actorsInRange = new List<Creature>();
+            foreach(Creature c in actors)
+            {
+                foreach(Point p in p_)
+                {
+                    if(p == c.tsPos) { actorsInRange.Add(c); }
+                }
+            }
+            return actorsInRange.ToArray();
+        }
+
         //save
         public void SaveTileset()
         {
@@ -227,9 +335,9 @@ namespace Roleplay
                     string name = ts.tiles[x, y].name;
                     tileEl.SetValue(name);
 
-                    int index = getTileIndex(name);
                     tileEl.Add(new XAttribute("x", x));
                     tileEl.Add(new XAttribute("y", y));
+                    tileEl.Add(new XAttribute("sheet", ts.tiles[x,y].tex.sheetName));
 
                     tilesetEl.Add(tileEl);
                 }
@@ -239,9 +347,205 @@ namespace Roleplay
             doc.Element("Tileset").ReplaceWith(tilesetEl);
             doc.Save("Content/Xml/TestTileset.xml");
         }
-        //update
+
+        //!!! UPDATE !!!
+        protected override void Update(GameTime gameTime)
+        {
+            kbs = Keyboard.GetState();
+            UpdateKeys();
+            UpdateMouse();
+            switch (gm)
+            {
+                case (GameMode.TilesetEditor):
+                    UpdateEditor(gameTime);
+                    break;
+                case (GameMode.Game):
+                    UpdateGame(gameTime);
+                    break;
+                case (GameMode.Menus):
+                    UpdateMenus(gameTime);
+                    break;
+            }
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+            base.Update(gameTime);
+        }
+
+        //game
+        void UpdateGame(GameTime gt_)
+        {
+            UpdateTranslation();
+            if (GetPressed("unzoom")) { zoom -= 0.1f; }
+            if (GetPressed("zoom")) { zoom += 0.1f; }
+            if (GetPressed("menu")) { gm = GameMode.Menus; SetupMenu(); }
+
+            PositionToTile(guy);
+            PositionToTile(enemy);
+
+            CheckButtons();
+
+            if (CurrentActor().isPlayer)
+            {
+                switch (gim)
+                {
+                    case (GameInputMode.ActorMenu):
+                        break;
+                    case (GameInputMode.CastSkill):
+                        UpdateSkillCasting();
+                        break;
+                }
+            }
+            else { ApplyTurn(getBestOption()); }
+        }
+        void PositionToTile(Entity ent)
+        {
+            ent.pos.Y = ent.tsPos.X * 50 + ent.tsPos.Y * 50 + 100 - (ent.getFrame().Height * 200f / ent.getFrame().Width);
+            ent.pos.X = ent.tsPos.X * 100 + ent.tsPos.Y * -100;
+        }
+        //actor turn stuff
+        void CheckActorMenuButtons()
+        {
+            //add or remove button
+            for (int i = buttons.Count - 1; i >= 0; i--)
+            {
+                if (buttons[i].action == "EndTurn") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
+
+                if (buttons[i].action == "SelectSkill") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
+            }
+            if (actors[actorKey].isPlayer)
+            {
+                MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
+                buttons.Add(new Button(tex, new Vector2(920, 980), "EndTurn"));
+                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
+                buttons.Add(new Button(tex, new Vector2(920, 880), "SelectSkill"));
+            }
+        } //adds or removes buttons based on the current actor
+        void CastSkill(int key, Point location)
+        {
+            foreach (Creature c in actors)
+            {
+                if (c.tsPos == location)
+                {
+                    c.hp -= CurrentActor().skills[key].damage;
+                }
+            }
+        }
+        void UpdateActorMenu()
+        {
+
+        }
+        void UpdateSkillCasting()
+        {
+            for (int x = 0; x < actors.Count; x++)
+            {
+                if (x == actorKey) { x++; if (x >= actors.Count) { break; } }
+                if (isInRange(actors[x], pointsInRange(actors[actorKey].tsPos, actors[actorKey].skills[skillKey].range)))
+                {
+                    if (mouseTsPos() == actors[x].tsPos)
+                    {
+                        if (IsleftClicking())
+                        {
+                            CastSkill(skillKey, actors[x].tsPos);
+                            ToggleToActorMenu();
+                        }
+                    }
+                }
+            }
+        }
+        //toggles
+        void ToggleNextActor()
+        {
+            actorKey++;
+            if (actorKey >= actors.Count) { actorKey = 0; }
+            while (actors[actorKey].isActive == false) { actorKey++; if (actorKey >= actors.Count) { actorKey = 0; } }
+            ToggleToActorMenu();
+        }
+        void ToggleToActorMenu()
+        {
+            gim = GameInputMode.ActorMenu;
+            //buttons
+            buttons.Clear();
+            CheckActorMenuButtons();
+        }
+        void ToggleSkillSelectButtons()
+        {
+            if (gim == GameInputMode.SkillSelect)
+            {
+                for (int x = 0; x < actors[actorKey].skills.Count; x++)
+                {
+                    MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
+                    buttons.Add(new Button(tex, new Vector2(920, 0 + (x * 100)), "SelectSkillKey", actors[actorKey].skills[x].name, x));
+                }
+            }
+            else
+            {
+                for (int i = buttons.Count - 1; i >= 0; i--)
+                {
+                    if (buttons[i].action == "SelectSkillKey") { buttons.RemoveAt(i); }
+                }
+            }
+        }
+        //AI
+        public Turn getBestOption()
+        {
+            Turn t = new Turn(new TurnOption[] { new TurnOption(OptionType.Move, 10, actors[actorKey].tsPos) });
+            int bestFitness = 0;
+            for (int k = 0; k < CurrentActor().skills.Count; k++)
+            {
+                foreach (Creature c in inRangeActors(pointsInRange(CurrentActor().tsPos, CurrentActor().skills[k].range)))
+                {
+                    int fitness = 0;
+                    fitness = CurrentActor().skills[k].damage;
+
+                    if (fitness > bestFitness)
+                    {
+                        bestFitness = fitness;
+
+                        TurnOption option = new TurnOption(OptionType.Skill, k, c.tsPos);
+                        t = new Turn(new TurnOption[] { option });
+                    }
+                }
+            }
+            return t;
+        }
+        void ApplyTurn(Turn turn_)
+        {
+            foreach(TurnOption opt in turn_.options)
+            {
+                switch (opt.type)
+                {
+                    case (OptionType.Skill):
+                        CastSkill(opt.key, opt.location);
+                        break;
+                }
+            }
+            ToggleNextActor();
+        }     
+
+        //menus
+        void UpdateMenus(GameTime gt_)
+        {
+            CheckButtons();
+        }
+        //editor
+        void UpdateEditor(GameTime gt_)
+        {
+            switch (tseMode)
+            {
+                case (TSEMode.Edit):
+                    UpdateTSE();
+                    break;
+
+                case (TSEMode.Select):
+                    UpdateTSESelect();
+                    break;
+            }
+            if (GetPressed("toggleSheet")) { SelectNextSheet(); }
+            if (GetPressed("save")) { SaveTileset(); }
+            if (GetPressed("menu")) { gm = GameMode.Menus; SetupMenu(); }
+        }
         public void SetQuickAccessTiles()
-        {           
+        {
             currentTile().pos = new Vector2(200, 50);
             lastTile().pos = new Vector2(100, 50);
             nextTile().pos = new Vector2(300, 50);
@@ -252,7 +556,7 @@ namespace Roleplay
             int y = 0; int ii = 0;
             for (int i = 0; i < editorTiles.Length; i++)
             {
-                editorTiles[i].pos = new Vector2(ii * 200, y*100);
+                editorTiles[i].pos = new Vector2(ii * 200, y * 100);
                 ii++;
                 if (ii > count)
                 { y++; ii = 0; }
@@ -260,10 +564,10 @@ namespace Roleplay
         }
         public void ToggleSelectedTile()
         {
-            if(tileIndex >= sheet.tiles.Length)
+            if (tileIndex >= currentSheet().tileSheet.tiles.Length)
             { tileIndex = 0; }
             if (tileIndex < 0)
-            { tileIndex = sheet.tiles.Length - 1; }
+            { tileIndex = currentSheet().tileSheet.tiles.Length - 1; }
             SetQuickAccessTiles();
 
             SaveTileset();
@@ -282,18 +586,158 @@ namespace Roleplay
                     tseMode = TSEMode.Select;
                     break;
             }
-            
+
         }
-        public void UpdateKeys()
+        public void UpdateTSESelect()
         {
-            //toggle TSESelect
-            if (kbs.IsKeyUp(k_TSESelect)) { pb_TSESelect = false; }
-            if (kbs.IsKeyDown(k_TSESelect) && !pb_TSESelect) { pb_TSESelect = true; p_TSESelect = true; }
-            else if (kbs.IsKeyDown(k_TSESelect)) { p_TSESelect = false; }
-            //save
-            if (kbs.IsKeyUp(k_TSESave)) { pb_TSESave = false; }
-            if (kbs.IsKeyDown(k_TSESave) && !pb_TSESave) { pb_TSESave = true; p_TSESave = true; }
-            else if (kbs.IsKeyDown(k_TSESave)) { p_TSESave = false; }
+            if (GetPressed("select"))
+            {
+                ToggleEditorMode();
+            }
+            if (IsleftClicking())
+            {
+                for (int i = 0; i < editorTiles.Length; i++)
+                {
+                    if (editorTiles[i].getFrame().Contains(mousePos))
+                    {
+                        tileIndex = i;
+                        ToggleEditorMode();
+                        break;
+                    }
+                }
+            }
+        }
+        public void UpdateTSE()
+        {
+            ts.PlaceTiles();
+            UpdateTranslation();
+            bool switched = false;
+            if (lastTile().getFrame().Contains(mousePos))
+            {
+                if (IsleftClicking())
+                {
+                    tileIndex--;
+                    ToggleSelectedTile();
+                    switched = true;
+                }
+            }
+            if (nextTile().getFrame().Contains(mousePos))
+            {
+                if (IsleftClicking())
+                {
+                    SelectNextSheet();
+                    ToggleSelectedTile();
+                    switched = true;
+                }
+            }
+            if (!switched)
+            {
+                Point closest = mouseTsPos();
+                if (ts.tiles[closest.X, closest.Y].getFrame().Contains(getMousePos()))
+                {
+                    if (IsleftClicking())
+                    {
+                        ts.tiles[closest.X, closest.Y] = GetTile(currentSheet().tileSheet.tiles[tileIndex], currentSheet().name);
+                        ts.PlaceTiles();
+                    }
+                }
+            }
+            if (IsleftClicking())
+            {
+                Vector2 mp = getMousePos();
+                if (mp.X > 100 && mp.Y < ts.width * 50 + 50)
+                { ts = Expand(ts, ISODIR.UR, 1); }
+                else if (mp.X > ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.width * 50 + 50)
+                { ts = Expand(ts, ISODIR.DR, 1); }
+                else if (mp.X < ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.height * 50 + 50)
+                { ts = Expand(ts, ISODIR.DL, 1); }
+                else if (mp.X < 100 && mp.Y < ts.height * 50 + 50)
+                { ts = Expand(ts, ISODIR.UL, 1); }
+            }
+            if (isRightClicking())
+            {
+                Vector2 mp = getMousePos();
+                if (mp.X > 100 && mp.Y < ts.width * 50 + 50)
+                { ts = Expand(ts, ISODIR.UR, -1); }
+                else if (mp.X > ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.width * 50 + 50)
+                { ts = Expand(ts, ISODIR.DR, -1); }
+                else if (mp.X < ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.height * 50 + 50)
+                { ts = Expand(ts, ISODIR.DL, -1); }
+                else if (mp.X < 100 && mp.Y > ts.height * 50 + 50)
+                { ts = Expand(ts, ISODIR.UL, -1); }
+            }
+            if (GetPressed("select"))
+            {
+                ToggleEditorMode();
+            }
+            if (GetPressed("unzoom")) { zoom -= 0.1f; }
+            if (GetPressed("zoom")) { zoom += 0.1f; }
+        }
+        //general
+        public Point mouseTsPos()
+        {
+            Point closest = new Point(0, 0);
+            float closestdist = 1000;
+            for (int x = 0; x < ts.width; x++)
+            {
+                for (int y = 0; y < ts.height; y++)
+                {
+                    float dist = Vector2.Distance(getMousePos(), ts.tiles[x, y].getMiddle());
+                    if (dist < closestdist) { closestdist = dist; closest = new Point(x, y); }
+                }
+            }
+            return closest;
+        }
+        public bool isInRange(Entity ent, Point[] points)
+        {
+            foreach(Point p in points) { if (p == ent.tsPos) { return true; } }
+            return false;
+        }
+        void CheckButtons()
+        {
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                if(buttons[i].getFrame().Contains(mousePos) && IsleftClicking())
+                {
+                    switch (buttons[i].action)
+                    {
+                        case ("TilesetEditor"):                           
+                            gm = GameMode.TilesetEditor; SetupTSE();
+                            break;
+                        case ("GameStart"):
+                            gm = GameMode.Game; SetupGame();
+                            break;
+                        case ("EndTurn"):
+                            ToggleNextActor();
+                            ToggleToActorMenu();
+                            break;
+                        case ("SelectSkill"):
+                            gim = GameInputMode.SkillSelect;
+                            ToggleSkillSelectButtons();
+                            break;
+                        case ("SelectSkillKey"):
+                            gim = GameInputMode.CastSkill;
+                            SelectSkill(buttons[i].key);
+                            ToggleSkillSelectButtons();
+                            break;
+                    }
+                }
+            }
+        }
+        void TargetSheet(string name_)
+        {
+            for(int i = 0; i < sheets.Count; i++)
+            {
+                if(sheets[i].name == name_)
+                {
+                    sheetIndex = i;
+                    break;
+                }
+            }
+        }
+        void UpdateKeys()
+        {
+            foreach(KeyLogger kl in keys) { kl.Update(kbs); }
         }
         public void UpdateMouse()
         {
@@ -349,162 +793,36 @@ namespace Roleplay
             if (kbs.IsKeyDown(Keys.Left)) { translation.X += translationSpeed; }
             if (kbs.IsKeyDown(Keys.Right)) { translation.X -= translationSpeed; }
         }
-        public void UpdateTSESelect()
+        public void SelectNextSheet()
         {
-            if (p_TSESelect)
-            {
-                ToggleEditorMode();
-            }
-            if (IsleftClicking())
-            {
-                for (int i = 0; i < editorTiles.Length; i++)
-                {
-                    if (editorTiles[i].getFrame().Contains(mousePos))
-                    {
-                        tileIndex = i;
-                        ToggleEditorMode();
-                        break;
-                    }
-                }
-            }
-        }
-        public void UpdateTSE()
-        {
-            UpdateTranslation();
-            bool switched = false;
-            if (lastTile().getFrame().Contains(mousePos))
-            {
-                if (IsleftClicking())
-                {
-                    tileIndex--;
-                    ToggleSelectedTile();
-                    switched = true;
-                }
-            }
-            if (nextTile().getFrame().Contains(mousePos))
-            {
-                if (IsleftClicking())
-                {
-                    tileIndex++;
-                    ToggleSelectedTile();
-                    switched = true;
-                }
-            }
-            if (!switched)
-            {
-                Point closest = new Point(0, 0);
-                float closestdist = 1000;
-                for (int x = 0; x < ts.width; x++)
-                {
-                    for (int y = 0; y < ts.height; y++)
-                    {
-                        float dist = Vector2.Distance(getMousePos(), ts.tiles[x, y].getMiddle());
-                        if (dist < closestdist) { closestdist = dist; closest = new Point(x, y); }
-                    }
-                }
-                if (ts.tiles[closest.X, closest.Y].getFrame().Contains(getMousePos()))
-                {
-                    if (IsleftClicking())
-                    {
-                        ts.tiles[closest.X, closest.Y] = GetTile(sheet.tiles[tileIndex]);
-                        ts.PlaceTiles();
-                    }                    
-                }
-            }
-            if (IsleftClicking())
-            {
-                if (mousePos.X + translation.X * -1 > 100)
-                {
-                    if (mousePos.Y + translation.Y * -1 > ts.tiles.GetLength(0) * 50) { ts = Expand(ts, ISODIR.DR, 1); }
-                    else { ts = Expand(ts, ISODIR.UR, 1); }
-                }
-                else
-                {
-                    if (mousePos.Y + translation.Y * -1 > ts.tiles.GetLength(0) * 50) { ts = Expand(ts, ISODIR.DL, 1); }
-                    else { ts = Expand(ts, ISODIR.UL, 1); }
-                }
-                
-            }
-            if (isRightClicking())
-            {
-                if (mousePos.X + translation.X * -1 > 100)
-                {
-                    if (mousePos.Y + translation.Y * -1 > ts.tiles.GetLength(0) * 50) { ts = Expand(ts, ISODIR.DR, -1); }
-                    else { ts = Expand(ts, ISODIR.UR, -1); }
-                }
-                else
-                {
-                    if (mousePos.Y + translation.Y * -1 > ts.tiles.GetLength(0) * 50) { ts = Expand(ts, ISODIR.DL, -1); }
-                    else { ts = Expand(ts, ISODIR.UL, -1); }
-                }
+            sheetIndex++;
+            if(sheetIndex >= sheets.Count) { sheetIndex = 0; }
+            SetupSheet();
+        }      
 
-            }
-            if (p_TSESelect)
+        //draw       
+        void DrawButtons()
+        {
+            foreach(Button b in buttons)
             {
-                ToggleEditorMode();
+                b.Draw(spriteBatch, 1f);
             }
         }
-        void UpdateEditor(GameTime gt_)
-        {
-            switch (tseMode)
-            {
-                case (TSEMode.Edit):
-                    UpdateTSE();
-                    break;
-
-                case (TSEMode.Select):
-                    UpdateTSESelect();
-                    break;
-            }
-            if (p_TSESave) { SaveTileset(); }
-            
-        }
-        void UpdateMenus(GameTime gt_)
-        {
-            if (b.getFrame().Contains(getMousePos()) && IsleftClicking()) { gm = GameMode.TilesetEditor; SetupTSE(); }
-        }
-        void UpdateGame(GameTime gt_)
-        {
-
-        }
-        protected override void Update(GameTime gameTime)
-        {
-            kbs = Keyboard.GetState();
-            UpdateKeys();
-            UpdateMouse();
-            switch (gm)
-            {
-                case (GameMode.TilesetEditor):
-                    UpdateEditor(gameTime);
-                    break;
-                case (GameMode.Game):
-                    UpdateGame(gameTime);
-                    break;
-                case (GameMode.Menus):
-                    UpdateMenus(gameTime);
-                    break;
-            }
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-            base.Update(gameTime);
-        }
-
-        //draw
         void DrawTSESelect()
         {
             if (dPhase == DrawPhase.Trans) { }              
             else {
-                foreach (Tile t in editorTiles) { t.Draw(spriteBatch); }
+                foreach (Tile t in editorTiles) { t.Draw(spriteBatch,1f); }
             }
         }
         void DrawTSE()
         {
             if (dPhase == DrawPhase.Trans)
-                ts.Draw(spriteBatch);
+                ts.Draw(spriteBatch,zoom);
             else {
-                lastTile().Draw(spriteBatch);
-                nextTile().Draw(spriteBatch);
-                currentTile().Draw(spriteBatch);
+                lastTile().Draw(spriteBatch,1f);
+                nextTile().Draw(spriteBatch,1f);
+                currentTile().Draw(spriteBatch,1f);
             }
         }
         void DrawEditor()
@@ -520,23 +838,71 @@ namespace Roleplay
                     break;
             }           
         }
+        void DrawActorStats()
+        {
+            fDrawer.DrawText(Vector2.Zero, "hp: " + actors[actorKey].hp, 1920, 1080, spriteBatch, 0.5f);
+            fDrawer.DrawText(new Vector2(0, 100), "name: " + actors[actorKey].name, 1920, 1080, spriteBatch, 0.5f);
+        }
+        void DrawSkillSelect()
+        {
+            for(int x = 0; x < buttons.Count; x++)
+            {
+                if(buttons[x].action == "SelectSkillKey")
+                {
+                    fDrawer.DrawText(buttons[x].pos, buttons[x].keyname, 1080, 1920, spriteBatch, 1);
+                }
+            }
+        }
         void DrawGame() {
             if (dPhase == DrawPhase.Trans)
             {
-
+                ts.Draw(spriteBatch, zoom);
+                guy.Draw(spriteBatch, zoom);
+                enemy.Draw(spriteBatch, zoom);
             }
-            else {
-
+            else {             
+                DrawActorStats();
+                DrawButtons();
+                if (gim == GameInputMode.SkillSelect)
+                {
+                    DrawSkillSelect();
+                }
+                if (gim == GameInputMode.CastSkill)
+                {
+                    DrawSkillCasting();
+                }
+                DrawGameDebugInfo();
             }
+        }
+        void DrawGameDebugInfo()
+        {
+            if(gim == GameInputMode.ActorMenu)
+            {
+                fDrawer.DrawText(new Vector2(1400, 0), "actor menu", 1920, 1080, spriteBatch, 0.5f);
+            }
+            if (gim == GameInputMode.SkillSelect)
+            {
+                fDrawer.DrawText(new Vector2(1400, 0), "skill select", 1920, 1080, spriteBatch, 0.5f);
+            }
+            if (gim == GameInputMode.CastSkill)
+            {
+                fDrawer.DrawText(new Vector2(1400, 0), "casting time", 1920, 1080, spriteBatch, 0.5f);
+            }
+            fDrawer.DrawText(new Vector2(1400, 0), "" + getBestOption().options[0].key, 1920, 1080, spriteBatch, 0.5f);
         }
         void DrawMenus()
         {
             if (dPhase == DrawPhase.Trans) { }
                 
             else {
-                b.Draw(spriteBatch);
+                fDrawer.DrawText(Vector2.Zero, "test text!", 400, 400, spriteBatch, 0.5f);
+                DrawButtons();
             }
 
+        }
+        void DrawSkillCasting()
+        {
+            fDrawer.DrawText(new Vector2(1400,0), actors[actorKey].skills[skillKey].name, 1080, 1920, spriteBatch, 0.5f);
         }
         protected override void Draw(GameTime gameTime)
         {
@@ -544,7 +910,7 @@ namespace Roleplay
             //draw translated stuff on the target
             Matrix translator = Matrix.CreateTranslation(translation.X, translation.Y, 0);
             GraphicsDevice.SetRenderTarget(rt);
-            spriteBatch.Begin(transformMatrix: translator);
+            spriteBatch.Begin(transformMatrix: translator, samplerState: SamplerState.PointWrap);
             switch (gm)
             {
                 case (GameMode.TilesetEditor):
@@ -561,7 +927,7 @@ namespace Roleplay
             dPhase = DrawPhase.NonTrans;
             GraphicsDevice.SetRenderTarget(nonTransRt);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            spriteBatch.Begin();
+            spriteBatch.Begin(samplerState: SamplerState.PointWrap);
             switch (gm)
             {
                 case (GameMode.TilesetEditor):
@@ -574,7 +940,7 @@ namespace Roleplay
                     DrawMenus();
                     break;
             }
-            cursor.Draw(spriteBatch, mousePos);
+            cursor.Draw(spriteBatch, mousePos,1f,false);
             spriteBatch.End();
             //draw overlay
             GraphicsDevice.SetRenderTarget(null);
