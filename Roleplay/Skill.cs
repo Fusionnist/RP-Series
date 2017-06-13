@@ -10,17 +10,22 @@ namespace Roleplay
 
     public class Skill
     {
+        public bool damages;
         public SkillTrajectory traj;
         public int range;
         public int damage;
         public string name;
+        public int AP;
 
-        public Skill(SkillTrajectory traj_, int range_, int damage_, string name_)
+        public Skill(SkillTrajectory traj_, int range_, int damage_, string name_, int AP_)
         {
+            damages = true;
+
             traj = traj_;
             name = name_;
             damage = damage_;
             range = range_;
+            AP = AP_;
         }
     }
 }

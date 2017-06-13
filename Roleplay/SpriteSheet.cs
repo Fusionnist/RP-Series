@@ -118,7 +118,7 @@ namespace Roleplay
                 if(crSheet.names[x] == name_)
                 {
                     List<Skill> skills = new List<Skill>();
-                    return new Creature(getTex(name_), Vector2.Zero, Point.Zero, crSheet.hp[x], crSheet.maxhp[x], name_, skills, crSheet.isActive[x]);
+                    return new Creature(getTex(name_), Vector2.Zero, Point.Zero, crSheet.hp[x], crSheet.maxhp[x], name_, skills, crSheet.isActive[x], 5);
                 }
             }
             return null;

@@ -3,10 +3,16 @@
   <Textures src="Tiles" name="test">
     <Texture anim ="false" name="test1" fa="R" x="0" y="0" w="200" h="100"> </Texture>
     <Texture anim ="false" name="test2" fa="R" x="200" y="0" w="200" h="100"> </Texture>
+    <Texture anim ="false" name="test3" fa="R" x="400" y="0" w="200" h="100"> </Texture>
+    <Texture anim ="false" name="redChair" fa="R" x="0" y="100" w="60" h="120"> </Texture>
     <Tilesheet>
       <Tile name="test1"></Tile>
       <Tile name="test2"></Tile>
-    </Tilesheet> 
+      <Tile name="test3"></Tile>
+    </Tilesheet>
+    <Creatures>
+      <Creature name="redChair" hp="5" maxhp="110" active="false"></Creature>
+    </Creatures>
   </Textures>
   
   <Textures src="testSheet" name="testAssets">

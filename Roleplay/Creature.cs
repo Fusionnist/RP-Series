@@ -9,9 +9,10 @@ namespace Roleplay
     {
         public List<Skill> skills;
         public string name;
+        public int maxAP, AP;
         public int hp, maxHp;
         public bool isPlayer, isActive;
-        public Creature(MagicTexture tex_, Vector2 pos_, Point tsPos_, int hp_, int maxHp_, string name_, List<Skill> skills_, bool isActive_) : base(tex_, pos_, tsPos_)
+        public Creature(MagicTexture tex_, Vector2 pos_, Point tsPos_, int hp_, int maxHp_, string name_, List<Skill> skills_, bool isActive_, int maxAP_) : base(tex_, pos_, tsPos_)
         {
             skills = skills_;
             name = name_;
@@ -19,6 +20,12 @@ namespace Roleplay
             maxHp = maxHp_;
             tsPos = tsPos_;
             isActive = isActive_;
+            maxAP = maxAP_;
+            ResetAP();
+        }
+        public void ResetAP()
+        {
+            AP = maxAP;
         }
         public void LearnSkill(Skill skill_)
         {

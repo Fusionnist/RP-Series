@@ -7,7 +7,7 @@ using System;
 
 namespace Roleplay
 {
-    enum GameInputMode { ActorMenu, SkillSelect, CastSkill }
+    enum GameInputMode { ActorMenu, SkillSelect, CastSkill, MoveActor }
     enum GameMode { TilesetEditor, Game, Menus }
     enum TSEMode { Edit, Select}
     enum DrawPhase {Trans, NonTrans }
@@ -153,12 +153,12 @@ namespace Roleplay
             TargetSheet("testAssets");
             guy = currentSheet().getCreature("jalapeno");
             guy.BecomePlayer();
-            guy.LearnSkill(new Skill(SkillTrajectory.Linear, 4, 10, "skill1"));
-            guy.LearnSkill(new Skill(SkillTrajectory.Linear, 5, 1, "skill2 lol"));
-            guy.tsPos = new Point(20, 20);
+            guy.LearnSkill(new Skill(SkillTrajectory.Linear, 4, 10, "skill1", 1));
+            guy.LearnSkill(new Skill(SkillTrajectory.Linear, 5, 1, "skill2 lol", 1));
+            guy.tsPos = new Point(2, 2);
             PositionToTile(guy);
             enemy = currentSheet().getCreature("booperino");
-            enemy.LearnSkill(new Skill(SkillTrajectory.Linear, 5, 1, "skill2 lol"));
+            enemy.LearnSkill(new Skill(SkillTrajectory.Linear, 5, 1, "skill2 lol", 1));
 
             actors = new List<Creature>();
             actors.Add(guy);
@@ -170,6 +170,18 @@ namespace Roleplay
         }
 
         //get
+        public bool IsMouseOnTile()
+        {
+            Point p = mouseTsPos();
+            if(p.X >= 0 && p.X < ts.width)
+            {
+                if (p.Y >= 0 && p.Y < ts.height)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public bool GetPressed(string name_)
         {
             bool b = false;
@@ -393,9 +405,17 @@ namespace Roleplay
                     case (GameInputMode.CastSkill):
                         UpdateSkillCasting();
                         break;
+                    case (GameInputMode.MoveActor):
+                        Move();
+                        break;
                 }
             }
             else { ApplyTurn(getBestOption()); }
+
+            if(CurrentActor().maxAP == 0)
+            {               
+                ToggleNextActor();
+            }
         }
         void PositionToTile(Entity ent)
         {
@@ -403,6 +423,27 @@ namespace Roleplay
             ent.pos.X = ent.tsPos.X * 100 + ent.tsPos.Y * -100;
         }
         //actor turn stuff
+        void Move()
+        {
+            if (IsleftClicking())
+            {
+                if (IsMouseOnTile())
+                {
+                    Point p = mouseTsPos();
+                    Point x = p - CurrentActor().tsPos;
+                    int ap = Math.Abs(x.X) + Math.Abs(x.Y);
+                    if(ap <= CurrentActor().AP)
+                    {
+                        CurrentActor().AP -= ap;
+                        CurrentActor().tsPos = mouseTsPos();
+                    }
+                }
+            }
+        }
+        void SelectSkill(int key)
+        {
+            skillKey = key;
+        }       
         void CheckActorMenuButtons()
         {
             //add or remove button
@@ -411,6 +452,8 @@ namespace Roleplay
                 if (buttons[i].action == "EndTurn") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
 
                 if (buttons[i].action == "SelectSkill") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
+
+                if (buttons[i].action == "MoveActor") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
             }
             if (actors[actorKey].isPlayer)
             {
@@ -418,17 +461,18 @@ namespace Roleplay
                 buttons.Add(new Button(tex, new Vector2(920, 980), "EndTurn"));
                 tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
                 buttons.Add(new Button(tex, new Vector2(920, 880), "SelectSkill"));
+                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
+                buttons.Add(new Button(tex, new Vector2(920, 700), "MoveActor"));
             }
         } //adds or removes buttons based on the current actor
         void CastSkill(int key, Point location)
         {
-            foreach (Creature c in actors)
+            if(CurrentActor().AP >= CurrentActor().skills[key].AP)
             {
-                if (c.tsPos == location)
-                {
-                    c.hp -= CurrentActor().skills[key].damage;
-                }
-            }
+                CurrentActor().AP -= CurrentActor().skills[key].AP;
+
+                GetActorAtPos(location).hp -= CurrentActor().skills[key].damage;
+            }           
         }
         void UpdateActorMenu()
         {
@@ -455,6 +499,7 @@ namespace Roleplay
         //toggles
         void ToggleNextActor()
         {
+            CurrentActor().ResetAP();
             actorKey++;
             if (actorKey >= actors.Count) { actorKey = 0; }
             while (actors[actorKey].isActive == false) { actorKey++; if (actorKey >= actors.Count) { actorKey = 0; } }
@@ -466,6 +511,10 @@ namespace Roleplay
             //buttons
             buttons.Clear();
             CheckActorMenuButtons();
+        }
+        void ToggleMoveActor()
+        {
+            gim = GameInputMode.MoveActor;
         }
         void ToggleSkillSelectButtons()
         {
@@ -625,7 +674,7 @@ namespace Roleplay
             {
                 if (IsleftClicking())
                 {
-                    SelectNextSheet();
+                    tileIndex++;
                     ToggleSelectedTile();
                     switched = true;
                 }
@@ -663,7 +712,7 @@ namespace Roleplay
                 { ts = Expand(ts, ISODIR.DR, -1); }
                 else if (mp.X < ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.height * 50 + 50)
                 { ts = Expand(ts, ISODIR.DL, -1); }
-                else if (mp.X < 100 && mp.Y > ts.height * 50 + 50)
+                else if (mp.X < 100 && mp.Y < ts.height * 50 + 50)
                 { ts = Expand(ts, ISODIR.UL, -1); }
             }
             if (GetPressed("select"))
@@ -714,6 +763,9 @@ namespace Roleplay
                         case ("SelectSkill"):
                             gim = GameInputMode.SkillSelect;
                             ToggleSkillSelectButtons();
+                            break;
+                        case ("MoveActor"):                           
+                            ToggleMoveActor();
                             break;
                         case ("SelectSkillKey"):
                             gim = GameInputMode.CastSkill;
@@ -842,6 +894,7 @@ namespace Roleplay
         {
             fDrawer.DrawText(Vector2.Zero, "hp: " + actors[actorKey].hp, 1920, 1080, spriteBatch, 0.5f);
             fDrawer.DrawText(new Vector2(0, 100), "name: " + actors[actorKey].name, 1920, 1080, spriteBatch, 0.5f);
+            fDrawer.DrawText(new Vector2(0, 200), "ap: " + actors[actorKey].AP, 1920, 1080, spriteBatch, 0.5f);
         }
         void DrawSkillSelect()
         {
