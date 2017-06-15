@@ -694,14 +694,61 @@ namespace Roleplay
             if (IsleftClicking())
             {
                 Vector2 mp = getMousePos();
-                if (mp.X > 100 && mp.Y < ts.width * 50 + 50)
-                { ts = Expand(ts, ISODIR.UR, 1); }
-                else if (mp.X > ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.width * 50 + 50)
-                { ts = Expand(ts, ISODIR.DR, 1); }
-                else if (mp.X < ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.height * 50 + 50)
-                { ts = Expand(ts, ISODIR.DL, 1); }
-                else if (mp.X < 100 && mp.Y < ts.height * 50 + 50)
-                { ts = Expand(ts, ISODIR.UL, 1); }
+
+                Vector2 URcorner = new Vector2(100, ts.width * 50 + 50);
+                Vector2 DLcorner = new Vector2(ts.height * -100 + ts.width * 100 + 100, ts.height * 50 + 50);
+                Vector2 DRcorner = new Vector2(ts.height * -100 + ts.width * 100 + 100, ts.width * 50 + 50);
+                Vector2 ULcorner = new Vector2(100, ts.height * 50 + 50);
+                 
+                if (mp.X > URcorner.X 
+                    && mp.Y < URcorner.Y)
+                {
+                    float xl = DLcorner.X - URcorner.X;
+                    float mx = mp.X - URcorner.X;
+                    float yl = DLcorner.Y - URcorner.Y;
+                    float my = mp.Y - URcorner.Y;
+
+                    yl++;
+                    if(mx > xl - (xl / -yl * -my) || xl == 0)
+                    { ts = Expand(ts, ISODIR.UR, 1); }
+                }
+
+
+                if (mp.X > DRcorner.X
+                    && mp.Y > DRcorner.Y)
+                {
+                    float xl = ULcorner.X - DRcorner.X;
+                    float mx = mp.X - DRcorner.X;
+                    float yl = ULcorner.Y - DRcorner.Y;
+                    float my = mp.Y - DRcorner.Y;
+
+                    if (mx > xl - (xl / -yl * -my) || xl == 0)
+                    { ts = Expand(ts, ISODIR.DR, 1); }
+                }
+
+                if (mp.X < DLcorner.X
+                    && mp.Y > DLcorner.Y)
+                {
+                    float xl = URcorner.X - DLcorner.X;
+                    float mx = mp.X - DLcorner.X;
+                    float yl = URcorner.Y - DLcorner.Y;
+                    float my = mp.Y - DLcorner.Y;
+
+                    if (mx < xl - (xl / -yl * -my) || xl == 0)
+                    { ts = Expand(ts, ISODIR.DL, 1); }
+                }
+
+                if (mp.X < ULcorner.X
+                    && mp.Y < ULcorner.Y)
+                {
+                    float xl = DRcorner.X - ULcorner.X;
+                    float mx = mp.X - ULcorner.X;
+                    float yl = DRcorner.Y - ULcorner.Y;
+                    float my = mp.Y - ULcorner.Y;
+
+                    if (mx < xl - (xl / -yl * -my) || xl == 0)
+                    { ts = Expand(ts, ISODIR.UL, 1); }
+                }
             }
             if (isRightClicking())
             {
