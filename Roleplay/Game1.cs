@@ -394,6 +394,11 @@ namespace Roleplay
             PositionToTile(guy);
             PositionToTile(enemy);
 
+            foreach(Creature c in actors)
+            {
+                c.Update(gt_);
+            }
+
             CheckButtons();
 
             if (CurrentActor().isPlayer)
@@ -425,6 +430,7 @@ namespace Roleplay
         //actor turn stuff
         void Move()
         {
+            if(GetActorAtPos(mouseTsPos()) == null)
             if (IsleftClicking())
             {
                 if (IsMouseOnTile())
@@ -691,8 +697,12 @@ namespace Roleplay
                     }
                 }
             }
-            if (IsleftClicking())
+            bool l = IsleftClicking();
+            bool r = isRightClicking();
+            if (l||r)
             {
+                int m = 1;
+                if (r) { m = -1; }
                 Vector2 mp = getMousePos();
 
                 Vector2 URcorner = new Vector2(100, ts.width * 50 + 50);
@@ -710,7 +720,7 @@ namespace Roleplay
 
                     yl++;
                     if(mx > xl - (xl / -yl * -my) || xl == 0)
-                    { ts = Expand(ts, ISODIR.UR, 1); }
+                    { ts = Expand(ts, ISODIR.UR, m); }
                 }
 
 
@@ -723,7 +733,7 @@ namespace Roleplay
                     float my = mp.Y - DRcorner.Y;
 
                     if (mx > xl - (xl / -yl * -my) || xl == 0)
-                    { ts = Expand(ts, ISODIR.DR, 1); }
+                    { ts = Expand(ts, ISODIR.DR, m); }
                 }
 
                 if (mp.X < DLcorner.X
@@ -735,7 +745,7 @@ namespace Roleplay
                     float my = mp.Y - DLcorner.Y;
 
                     if (mx < xl - (xl / -yl * -my) || xl == 0)
-                    { ts = Expand(ts, ISODIR.DL, 1); }
+                    { ts = Expand(ts, ISODIR.DL, m); }
                 }
 
                 if (mp.X < ULcorner.X
@@ -747,20 +757,8 @@ namespace Roleplay
                     float my = mp.Y - ULcorner.Y;
 
                     if (mx < xl - (xl / -yl * -my) || xl == 0)
-                    { ts = Expand(ts, ISODIR.UL, 1); }
+                    { ts = Expand(ts, ISODIR.UL, m); }
                 }
-            }
-            if (isRightClicking())
-            {
-                Vector2 mp = getMousePos();
-                if (mp.X > 100 && mp.Y < ts.width * 50 + 50)
-                { ts = Expand(ts, ISODIR.UR, -1); }
-                else if (mp.X > ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.width * 50 + 50)
-                { ts = Expand(ts, ISODIR.DR, -1); }
-                else if (mp.X < ts.height * -100 + ts.width * 100 + 100 && mp.Y > ts.height * 50 + 50)
-                { ts = Expand(ts, ISODIR.DL, -1); }
-                else if (mp.X < 100 && mp.Y < ts.height * 50 + 50)
-                { ts = Expand(ts, ISODIR.UL, -1); }
             }
             if (GetPressed("select"))
             {

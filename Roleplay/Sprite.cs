@@ -17,7 +17,7 @@ namespace Roleplay
         {
             tex.Draw(sb_, pos,zoom_, false);
         }
-        public void Update(GameTime gt_)
+        public virtual void Update(GameTime gt_)
         {
             tex.Update(gt_);
         }

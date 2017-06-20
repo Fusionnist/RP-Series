@@ -7,6 +7,7 @@ namespace Roleplay
 {
     public class Creature : Entity
     {
+        public MagicTexture[] textures;
         public List<Skill> skills;
         public string name;
         public int maxAP, AP;
@@ -22,6 +23,25 @@ namespace Roleplay
             isActive = isActive_;
             maxAP = maxAP_;
             ResetAP();
+
+            textures = new MagicTexture[] { tex_ };
+        }
+        public void AcquireTextures(MagicTexture[] textures_)
+        {
+            textures = textures_;
+        }
+        public void SelectTexture(string name)
+        {
+            foreach(MagicTexture m in textures)
+            {
+                if(m.name == name)
+                    tex = m;
+            }
+        }
+        public override void Update(GameTime gt_)
+        {
+            ToggleActivity();
+            base.Update(gt_);
         }
         public void ResetAP()
         {
@@ -30,6 +50,11 @@ namespace Roleplay
         public void LearnSkill(Skill skill_)
         {
             skills.Add(skill_);
+        }
+        public void ToggleActivity()
+        {
+            if(hp <= 0) { isActive = false; }
+            if(hp > 0) { isActive = true; }
         }
         public void BecomePlayer()
         {

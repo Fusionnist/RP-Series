@@ -14,8 +14,12 @@ namespace Roleplay
         public Rectangle frame;
         int frameCount, frameCounter;
         float frameTime, frameTimer;
-        public string sheetName;
+        public string sheetName, name;
 
+        public void GetName(string name_)
+        {
+            name = name_;
+        }
         public MagicTexture(Texture2D source_, Rectangle sourceRect_, Facing face_, string sheetName_)
         {
             sheetName = sheetName_;
