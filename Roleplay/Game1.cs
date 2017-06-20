@@ -98,7 +98,7 @@ namespace Roleplay
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            cursor = new MagicTexture(Content.Load<Texture2D>("cursor"), new Rectangle(0, 0, 100, 100), Facing.L, string.Empty);
+            cursor = new MagicTexture(Content.Load<Texture2D>("cursor"), new Rectangle(0, 0, 100, 100), Facing.L, string.Empty, string.Empty);
             tex = Content.Load<Texture2D>("grad");
 
             buttons = new List<Button>();
@@ -118,9 +118,9 @@ namespace Roleplay
         {
             tileIndex = 0;
             List<Tile> editorTileList = new List<Tile>();
-            for (int i = 0; i < currentSheet().tileSheet.tiles.Length; i++)
+            for (int i = 0; i < currentSheet().tileSheet.tileNames.Length; i++)
             {
-                editorTileList.Add(GetTile(currentSheet().tileSheet.tiles[i], currentSheet().name));
+                editorTileList.Add(GetTile(currentSheet().tileSheet.tileNames[i], currentSheet().name));
             }
             editorTiles = editorTileList.ToArray();
             SetQuickAccessTiles();
@@ -137,7 +137,7 @@ namespace Roleplay
         }
         void SetupMenu()
         {
-            MagicTexture test2 = new MagicTexture(tex, new Rectangle(0, 0, tex.Width, tex.Height), Facing.N, string.Empty);
+            MagicTexture test2 = new MagicTexture(tex, new Rectangle(0, 0, tex.Width, tex.Height), Facing.N, string.Empty, string.Empty);
 
             buttons.Clear();
             buttons.Add(new Button(test2, new Vector2(300, 100), "TilesetEditor"));
@@ -260,7 +260,7 @@ namespace Roleplay
                 {
                     for (int y = 0; y < oH + modder.Y; y++)
                     {
-                        if (newTiles[x, y] == null) { newTiles[x, y] = GetTile(currentSheet().tileSheet.tiles[tileIndex], currentSheet().name); }
+                        if (newTiles[x, y] == null) { newTiles[x, y] = GetTile(currentSheet().tileSheet.tileNames[tileIndex], currentSheet().name); }
                     }
                 }
                 return new Tileset(newTiles, oW + modder.X, oH + modder.Y, 200, 100);
@@ -271,7 +271,6 @@ namespace Roleplay
         {
             TargetSheet(sheetName_);
             MagicTexture ttt = currentSheet().getTex(tilename_);
-
             return new Tile(ttt, Vector2.Zero,Point.Zero, tilename_);        
         }
         public Vector2 getMousePos()
@@ -280,7 +279,7 @@ namespace Roleplay
         }
         public Tile nextTile()
         {
-            if (tileIndex + 1 >= currentSheet().tileSheet.tiles.Length)
+            if (tileIndex + 1 >= currentSheet().tileSheet.tileNames.Length)
                 return editorTiles[0];
             else
                 return editorTiles[tileIndex + 1];
@@ -288,7 +287,7 @@ namespace Roleplay
         public Tile lastTile()
         {
             if (tileIndex - 1 < 0)
-                return editorTiles[currentSheet().tileSheet.tiles.Length - 1];
+                return editorTiles[currentSheet().tileSheet.tileNames.Length - 1];
             else
                 return editorTiles[tileIndex - 1];
         }
@@ -463,11 +462,11 @@ namespace Roleplay
             }
             if (actors[actorKey].isPlayer)
             {
-                MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
+                MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty, string.Empty);
                 buttons.Add(new Button(tex, new Vector2(920, 980), "EndTurn"));
-                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
+                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty, string.Empty);
                 buttons.Add(new Button(tex, new Vector2(920, 880), "SelectSkill"));
-                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
+                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty, string.Empty);
                 buttons.Add(new Button(tex, new Vector2(920, 700), "MoveActor"));
             }
         } //adds or removes buttons based on the current actor
@@ -528,7 +527,7 @@ namespace Roleplay
             {
                 for (int x = 0; x < actors[actorKey].skills.Count; x++)
                 {
-                    MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty);
+                    MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty, string.Empty);
                     buttons.Add(new Button(tex, new Vector2(920, 0 + (x * 100)), "SelectSkillKey", actors[actorKey].skills[x].name, x));
                 }
             }
@@ -619,10 +618,10 @@ namespace Roleplay
         }
         public void ToggleSelectedTile()
         {
-            if (tileIndex >= currentSheet().tileSheet.tiles.Length)
+            if (tileIndex >= currentSheet().tileSheet.tileNames.Length)
             { tileIndex = 0; }
             if (tileIndex < 0)
-            { tileIndex = currentSheet().tileSheet.tiles.Length - 1; }
+            { tileIndex = currentSheet().tileSheet.tileNames.Length - 1; }
             SetQuickAccessTiles();
 
             SaveTileset();
@@ -692,7 +691,7 @@ namespace Roleplay
                 {
                     if (IsleftClicking())
                     {
-                        ts.tiles[closest.X, closest.Y] = GetTile(currentSheet().tileSheet.tiles[tileIndex], currentSheet().name);
+                        ts.tiles[closest.X, closest.Y] = GetTile(currentSheet().tileSheet.tileNames[tileIndex], currentSheet().name);
                         ts.PlaceTiles();
                     }
                 }

@@ -10,10 +10,10 @@ namespace Roleplay
 {
     public class TileSheet
     {
-        public string[] tiles;
+        public string[] tileNames;
         public TileSheet(string[] tiles_)
         {
-            tiles = tiles_;
+            tileNames = tiles_;
         }
     }
 }

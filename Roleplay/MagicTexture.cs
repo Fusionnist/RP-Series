@@ -14,22 +14,24 @@ namespace Roleplay
         public Rectangle frame;
         int frameCount, frameCounter;
         float frameTime, frameTimer;
-        public string sheetName, name;
+        public string sheetName, name, tname;
 
         public void GetName(string name_)
         {
             name = name_;
         }
-        public MagicTexture(Texture2D source_, Rectangle sourceRect_, Facing face_, string sheetName_)
+        public MagicTexture(Texture2D source_, Rectangle sourceRect_, Facing face_, string sheetName_, string tname_)
         {
+            tname = tname_;
             sheetName = sheetName_;
             face = face_;
             source = source_;
             sourceRect = sourceRect_;
             frame = sourceRect_;
         }
-        public MagicTexture(Texture2D source_, Rectangle sourceRect_, Facing face_, int frameCount_, float frameTime_, float delay_, string sheetName_)
+        public MagicTexture(Texture2D source_, Rectangle sourceRect_, Facing face_, int frameCount_, float frameTime_, float delay_, string sheetName_, string tname_)
         {
+            tname = tname_;
             sheetName = sheetName_;
             face = face_;
             source = source_;

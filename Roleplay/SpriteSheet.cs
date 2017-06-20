@@ -15,7 +15,7 @@ namespace Roleplay
         public CreatureSheet crSheet;
         public Texture2D sourceTex;
 
-        public string[] mtexNames;
+        public string[] mtexTNames;
         public Rectangle[] sourceRects;
         public Facing[] facing;
         //anim
@@ -36,11 +36,12 @@ namespace Roleplay
             sourceTex = c_.Load<Texture2D>(sheetEl.Attribute("src").Value);
 
             List<string> tn = new List<string>();
-            if(sheetEl.Element("Tilesheet") != null)
+            List<string> texn = new List<string>();
+            if (sheetEl.Element("Tilesheet") != null)
             {
                 foreach (XElement el in sheetEl.Element("Tilesheet").Elements("Tile"))
                 {
-                    tn.Add(el.Attribute("name").Value);
+                    tn.Add(el.Attribute("tname").Value);
                 }
             }
             
@@ -50,6 +51,9 @@ namespace Roleplay
             List<int> crmhp = new List<int>();
             List<bool> cra = new List<bool>();
 
+            List<string[]> crTexNames = new List<string[]>();
+            List<string[]> crTexUses = new List<string[]>();
+
             if (sheetEl.Element("Creatures") != null)
             {
                 foreach (XElement el in sheetEl.Element("Creatures").Elements("Creature"))
@@ -58,6 +62,16 @@ namespace Roleplay
                     crhp.Add(int.Parse(el.Attribute("hp").Value));
                     crmhp.Add(int.Parse(el.Attribute("maxhp").Value));
                     cra.Add(bool.Parse(el.Attribute("active").Value));
+
+                    List<string> textures = new List<string>();
+                    List<string> uses = new List<string>();
+                    foreach (XElement ell in el.Elements("Texture"))
+                    {
+                        textures.Add(ell.Attribute("tname").Value);
+                        uses.Add(ell.Attribute("name").Value);
+                    }
+                    crTexNames.Add(textures.ToArray());
+                    crTexUses.Add(uses.ToArray());
                 }
             }
 
@@ -69,6 +83,7 @@ namespace Roleplay
             foreach (XElement el in sheetEl.Elements("Texture"))
             {
                 texNameList.Add(el.Attribute("name").Value);
+
                 ps.Add(new Rectangle(int.Parse(el.Attribute("x").Value), int.Parse(el.Attribute("y").Value), int.Parse(el.Attribute("w").Value), int.Parse(el.Attribute("h").Value)));
 
                 Facing f = Facing.N;
@@ -89,9 +104,9 @@ namespace Roleplay
                 frameTimeList.Add(tempFrameTime);
             }
 
-            mtexNames = texNameList.ToArray();
+            mtexTNames = texNameList.ToArray();
             tileSheet = new TileSheet(tn.ToArray());
-            crSheet = new CreatureSheet(crhp.ToArray(), crmhp.ToArray(), crn.ToArray(), cra.ToArray());
+            crSheet = new CreatureSheet(crhp.ToArray(), crmhp.ToArray(), crn.ToArray(), cra.ToArray(), crTexNames.ToArray(), crTexUses.ToArray());
             sourceRects = ps.ToArray();
             facing = facingList.ToArray();
             isAnimated = isAnimList.ToArray();
@@ -100,13 +115,13 @@ namespace Roleplay
         }
         public MagicTexture getTex(string n_)
         {
-            for(int i = 0; i < mtexNames.Length; i++)
+            for(int i = 0; i < mtexTNames.Length; i++)
             {
-                if(n_ == mtexNames[i]) {
+                if(n_ == mtexTNames[i]) {
                     if (isAnimated[i])
-                        return new MagicTexture(sourceTex, sourceRects[i], facing[i], frameCount[i], frameTime[i], 0,name);
+                        return new MagicTexture(sourceTex, sourceRects[i], facing[i], frameCount[i], frameTime[i], 0, name, mtexTNames[i]);
                     else
-                        return new MagicTexture(sourceTex, sourceRects[i], facing[i],name);
+                        return new MagicTexture(sourceTex, sourceRects[i], facing[i],name, mtexTNames[i]);
                 }
             }
             return null;
@@ -118,7 +133,13 @@ namespace Roleplay
                 if(crSheet.names[x] == name_)
                 {
                     List<Skill> skills = new List<Skill>();
-                    return new Creature(getTex(name_), Vector2.Zero, Point.Zero, crSheet.hp[x], crSheet.maxhp[x], name_, skills, crSheet.isActive[x], 5);
+                    List<MagicTexture> t = new List<MagicTexture>();
+                    for(int y =0; y < crSheet.tnames[x].Length; y++)
+                    {
+                        t.Add(getTex(crSheet.tnames[x][y]));
+                        t[y].GetName(crSheet.tuses[x][y]);
+                    }
+                    return new Creature(t.ToArray(), Vector2.Zero, Point.Zero, crSheet.hp[x], crSheet.maxhp[x], name_, skills, crSheet.isActive[x], 5);
                 }
             }
             return null;

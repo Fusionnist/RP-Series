@@ -13,7 +13,7 @@ namespace Roleplay
         public int maxAP, AP;
         public int hp, maxHp;
         public bool isPlayer, isActive;
-        public Creature(MagicTexture tex_, Vector2 pos_, Point tsPos_, int hp_, int maxHp_, string name_, List<Skill> skills_, bool isActive_, int maxAP_) : base(tex_, pos_, tsPos_)
+        public Creature(MagicTexture[] tex_, Vector2 pos_, Point tsPos_, int hp_, int maxHp_, string name_, List<Skill> skills_, bool isActive_, int maxAP_) : base(tex_[0], pos_, tsPos_)
         {
             skills = skills_;
             name = name_;
@@ -24,11 +24,7 @@ namespace Roleplay
             maxAP = maxAP_;
             ResetAP();
 
-            textures = new MagicTexture[] { tex_ };
-        }
-        public void AcquireTextures(MagicTexture[] textures_)
-        {
-            textures = textures_;
+            textures = tex_;
         }
         public void SelectTexture(string name)
         {
@@ -40,6 +36,8 @@ namespace Roleplay
         }
         public override void Update(GameTime gt_)
         {
+            if (hp < 0)
+            { SelectTexture("dead"); }
             ToggleActivity();
             base.Update(gt_);
         }

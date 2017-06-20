@@ -13,9 +13,13 @@ namespace Roleplay
         public bool[] isActive;
 
         public string[] names;
+        public string[][] tnames;
+        public string[][] tuses;
 
-        public CreatureSheet(int[] hp_, int[] maxHp_, string[] names_, bool[] isActive_)
+        public CreatureSheet(int[] hp_, int[] maxHp_, string[] names_, bool[] isActive_, string[][] tnames_, string[][] tuses_)
         {
+            tuses = tuses_;
+            tnames = tnames_;
             maxhp = maxHp_;
             hp = hp_;
             names = names_;
