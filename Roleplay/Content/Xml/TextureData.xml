@@ -4,11 +4,13 @@
     <Texture anim ="false" name="test1" fa="R" x="0" y="0" w="200" h="100"> </Texture>
     <Texture anim ="false" name="test2" fa="R" x="200" y="0" w="200" h="100"> </Texture>
     <Texture anim ="false" name="test3" fa="R" x="400" y="0" w="200" h="100"> </Texture>
+    <Texture anim ="false" name="test4" fa="R" x="600" y="0" w="200" h="100"> </Texture>
     <Texture anim ="false" name="redChair" fa="R" x="0" y="100" w="60" h="120"> </Texture>
     <Tilesheet>
-      <Tile tname="test1" name="tile"></Tile>
-      <Tile tname="test2" name="tile"></Tile>
-      <Tile tname="test3" name="tile"></Tile>
+      <Tile tname="test1" name="rock1"></Tile>
+      <Tile tname="test2" name="grass1"></Tile>
+      <Tile tname="test3" name="rock2"></Tile>
+      <Tile tname="test4" name="water1"></Tile>
     </Tilesheet>
     <Creatures>
       <Creature  name="redChair" hp="5" maxhp="110" active="false">
@@ -30,14 +32,5 @@
         <Texture tname ="sadBooperino" name="dead"></Texture>
       </Creature>
     </Creatures>
-  </Textures>
-  
-  <Textures src="tiles3" name="test2">
-    <Texture anim ="false" name="test1" fa="R" x="0" y="0" w="200" h="100"> </Texture>
-    <Texture anim ="false" name="test2" fa="R" x="200" y="0" w="200" h="100"> </Texture>
-    <Tilesheet>
-      <Tile tname="test1"  name="tile"></Tile>
-      <Tile tname="test2"  name="tile"></Tile>
-    </Tilesheet>
   </Textures>
 </Root>

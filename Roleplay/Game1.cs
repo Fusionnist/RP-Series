@@ -89,7 +89,6 @@ namespace Roleplay
             sheets = new List<SpriteSheet>();
             sheets.Add(new SpriteSheet("Content/Xml/TextureData.xml", Content, "testAssets"));
             sheets.Add(new SpriteSheet("Content/Xml/TextureData.xml", Content, "test"));
-            sheets.Add(new SpriteSheet("Content/Xml/TextureData.xml", Content, "test2"));
 
             SetupKeys();
             ResizeWindow();
@@ -270,8 +269,7 @@ namespace Roleplay
         public Tile GetTile(string tilename_, string sheetName_)
         {
             TargetSheet(sheetName_);
-            MagicTexture ttt = currentSheet().getTex(tilename_);
-            return new Tile(ttt, Vector2.Zero,Point.Zero, tilename_);        
+            return currentSheet().getTile(tilename_);      
         }
         public Vector2 getMousePos()
         {
@@ -279,7 +277,7 @@ namespace Roleplay
         }
         public Tile nextTile()
         {
-            if (tileIndex + 1 >= currentSheet().tileSheet.tileNames.Length)
+            if (tileIndex + 1 >= currentSheet().tileSheet.tileTNames.Length)
                 return editorTiles[0];
             else
                 return editorTiles[tileIndex + 1];
@@ -287,7 +285,7 @@ namespace Roleplay
         public Tile lastTile()
         {
             if (tileIndex - 1 < 0)
-                return editorTiles[currentSheet().tileSheet.tileNames.Length - 1];
+                return editorTiles[currentSheet().tileSheet.tileTNames.Length - 1];
             else
                 return editorTiles[tileIndex - 1];
         }
@@ -618,10 +616,10 @@ namespace Roleplay
         }
         public void ToggleSelectedTile()
         {
-            if (tileIndex >= currentSheet().tileSheet.tileNames.Length)
+            if (tileIndex >= currentSheet().tileSheet.tileTNames.Length)
             { tileIndex = 0; }
             if (tileIndex < 0)
-            { tileIndex = currentSheet().tileSheet.tileNames.Length - 1; }
+            { tileIndex = currentSheet().tileSheet.tileTNames.Length - 1; }
             SetQuickAccessTiles();
 
             SaveTileset();

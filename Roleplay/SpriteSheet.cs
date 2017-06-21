@@ -36,12 +36,14 @@ namespace Roleplay
             sourceTex = c_.Load<Texture2D>(sheetEl.Attribute("src").Value);
 
             List<string> tn = new List<string>();
+            List<string> tN = new List<string>();
             List<string> texn = new List<string>();
             if (sheetEl.Element("Tilesheet") != null)
             {
                 foreach (XElement el in sheetEl.Element("Tilesheet").Elements("Tile"))
                 {
                     tn.Add(el.Attribute("tname").Value);
+                    tN.Add(el.Attribute("name").Value);
                 }
             }
             
@@ -105,7 +107,7 @@ namespace Roleplay
             }
 
             mtexTNames = texNameList.ToArray();
-            tileSheet = new TileSheet(tn.ToArray());
+            tileSheet = new TileSheet(tn.ToArray(), tN.ToArray());
             crSheet = new CreatureSheet(crhp.ToArray(), crmhp.ToArray(), crn.ToArray(), cra.ToArray(), crTexNames.ToArray(), crTexUses.ToArray());
             sourceRects = ps.ToArray();
             facing = facingList.ToArray();
@@ -122,6 +124,18 @@ namespace Roleplay
                         return new MagicTexture(sourceTex, sourceRects[i], facing[i], frameCount[i], frameTime[i], 0, name, mtexTNames[i]);
                     else
                         return new MagicTexture(sourceTex, sourceRects[i], facing[i],name, mtexTNames[i]);
+                }
+            }
+            return null;
+        }
+        public Tile getTile(string name_)
+        {
+            for(int x = 0; x < tileSheet.tileNames.Length; x++)
+            {
+                if(tileSheet.tileNames[x] == name_)
+                {
+                    Tile t = new Tile(getTex(tileSheet.tileTNames[x]), Vector2.Zero, Point.Zero, tileSheet.tileNames[x]);
+                    return t;
                 }
             }
             return null;
