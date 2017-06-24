@@ -10,7 +10,8 @@ namespace Roleplay
     {
         public TileSheet tileSheet;
         public CreatureSheet crSheet;
-        public Texture2D[] sourceTex;
+        public List<Texture2D> sourceTex;
+        public List<int> srcKeys;
 
         //tex
         public List<int> srcIDs;
@@ -37,12 +38,13 @@ namespace Roleplay
                 List<bool> isAnimatedL = new List<bool>();
                 List<float> frameTimeL = new List<float>();
                 List<int> frameCountL = new List<int>();
+                List<int> srcKeysL = new List<int>();
 
                 foreach (XElement tEl in tDoc.Element("Root").Elements("Textures"))
                 {
                     int id = int.Parse(tEl.Attribute("id").Value);
                     sourceTexL.Add(c_.Load<Texture2D>(tEl.Attribute("src").Value));
-
+                    srcKeysL.Add(id);
                     foreach (XElement ttEl in tEl.Elements("Texture"))
                     {
                         srcIDsL.Add(id);
@@ -76,7 +78,8 @@ namespace Roleplay
                     }
                 }//gets and adds all tex values
 
-                sourceTex = sourceTexL.ToArray();
+                srcKeys = srcKeysL;
+                sourceTex = sourceTexL;
                 srcIDs = srcIDsL;
                 mTexIDs = mTexIDsL;
                 sourceRects = sourceRectsL;
@@ -191,16 +194,23 @@ namespace Roleplay
             }
             return null;
         }
-
-        public MagicTexture getTex(int ID)
+        Texture2D getSourceTex(int ID_)
+        {
+            for(int x = 0; x < srcKeys.Count; x++)
+            {
+                if(srcKeys[x] == ID_) { return sourceTex[x]; }
+            }
+            return null;
+        }
+        public MagicTexture getTex(int ID_)
         {
             for(int i = 0; i < mTexIDs.Count; i++)
             {
-                if(ID == mTexIDs[i]) {
+                if(ID_ == mTexIDs[i]) {
                     if (isAnimated[i])
-                        return new MagicTexture(sourceTex[srcIDs[i]], sourceRects[i], facing[i], frameCount[i], frameTime[i], 0, mTexIDs[i]);
+                        return new MagicTexture(getSourceTex(srcIDs[i]), sourceRects[i], facing[i], frameCount[i], frameTime[i], 0, mTexIDs[i]);
                     else
-                        return new MagicTexture(sourceTex[srcIDs[i]], sourceRects[i], facing[i], mTexIDs[i]);
+                        return new MagicTexture(getSourceTex(srcIDs[i]), sourceRects[i], facing[i], mTexIDs[i]);
                 }
             }
             return null;

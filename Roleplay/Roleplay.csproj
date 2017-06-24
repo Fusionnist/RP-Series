@@ -123,6 +123,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Commands.txt" />
+    <Content Include="Content\overlay.png" />
+    <Content Include="Content\tileset3.png" />
     <Content Include="Content\Xml\Campaign.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -38,6 +38,10 @@ namespace Roleplay
         Tileset ts;
         KeyboardState kbs;
 
+        //temp values
+        MagicTexture overlay;
+        Point[] currentRange;
+
         //values
         public float zoom;
         //data
@@ -103,6 +107,8 @@ namespace Roleplay
             
             string str = "abcdefghijklmnopqrstuvwxyz0123456789.!?,':;() ";
             fDrawer = new FontDrawer(Content.Load<Texture2D>("font"), 80, 100, str);
+
+            overlay = new MagicTexture(Content.Load<Texture2D>("overlay"), new Rectangle(0, 0, 200, 100), Facing.N, 0);
 
             SetupMenu();
         }
@@ -408,7 +414,7 @@ namespace Roleplay
         }
         void PositionToTile(Entity ent)
         {
-            ent.pos.Y = ent.tsPos.X * 50 + ent.tsPos.Y * 50 + 100 - (ent.getFrame().Height * 200f / ent.getFrame().Width);
+            ent.pos.Y = ent.tsPos.X * 50 + ent.tsPos.Y * 50 + 100 - (ent.getFrame(true).Height * 200f / ent.getFrame(true).Width);
             ent.pos.X = ent.tsPos.X * 100 + ent.tsPos.Y * -100;
         }
         //actor turn stuff
@@ -426,6 +432,7 @@ namespace Roleplay
                     {
                         CurrentActor().AP -= ap;
                         CurrentActor().tsPos = mouseTsPos();
+                        ToggleToActorMenu();
                     }
                 }
             }
@@ -433,6 +440,7 @@ namespace Roleplay
         void SelectSkill(int key)
         {
             skillKey = key;
+            currentRange = pointsInRange(CurrentActor().tsPos, CurrentActor().skills[skillKey].range);
         }       
         void CheckActorMenuButtons()
         {
@@ -505,6 +513,7 @@ namespace Roleplay
         void ToggleMoveActor()
         {
             gim = GameInputMode.MoveActor;
+            currentRange = pointsInRange(CurrentActor().tsPos, CurrentActor().AP);
         }
         void ToggleSkillSelectButtons()
         {
@@ -607,8 +616,6 @@ namespace Roleplay
             if (tileIndex < 0)
             { tileIndex = sheet.tileSheet.tileTIDs.Count - 1; }
             SetQuickAccessTiles();
-
-            SaveTileset();
         }
         public void ToggleEditorMode()
         {
@@ -636,7 +643,7 @@ namespace Roleplay
             {
                 for (int i = 0; i < editorTiles.Length; i++)
                 {
-                    if (editorTiles[i].getFrame().Contains(mousePos))
+                    if (editorTiles[i].getFrame(true).Contains(mousePos))
                     {
                         tileIndex = i;
                         ToggleEditorMode();
@@ -645,12 +652,23 @@ namespace Roleplay
                 }
             }
         }
+        void SelectTileByID(int ID_)
+        {
+            for(int x = 0; x < editorTiles.Length; x++)
+            {
+                if(editorTiles[x].ID == ID_)
+                {
+                    tileIndex = x;
+                    SetQuickAccessTiles();
+                }
+            }
+        }
         public void UpdateTSE()
         {
             ts.PlaceTiles();
             UpdateTranslation();
             bool switched = false;
-            if (lastTile().getFrame().Contains(mousePos))
+            if (lastTile().getFrame(true).Contains(mousePos))
             {
                 if (IsleftClicking())
                 {
@@ -659,7 +677,7 @@ namespace Roleplay
                     switched = true;
                 }
             }
-            if (nextTile().getFrame().Contains(mousePos))
+            if (nextTile().getFrame(true).Contains(mousePos))
             {
                 if (IsleftClicking())
                 {
@@ -671,12 +689,16 @@ namespace Roleplay
             if (!switched)
             {
                 Point closest = mouseTsPos();
-                if (ts.tiles[closest.X, closest.Y].getFrame().Contains(getMousePos()))
+                if (ts.tiles[closest.X, closest.Y].getFrame(true).Contains(getMousePos()))
                 {
                     if (IsleftClicking())
-                    {
+                    {                      
                         ts.tiles[closest.X, closest.Y] = sheet.getTile(sheet.tileSheet.tileIDs[tileIndex]);
                         ts.PlaceTiles();
+                    }
+                    else if (isRightClicking())
+                    {
+                        SelectTileByID(ts.tiles[closest.X, closest.Y].ID);
                     }
                 }
             }
@@ -759,7 +781,7 @@ namespace Roleplay
             {
                 for (int y = 0; y < ts.height; y++)
                 {
-                    float dist = Vector2.Distance(getMousePos(), ts.tiles[x, y].getMiddle());
+                    float dist = Vector2.Distance(getMousePos(), ts.tiles[x, y].getMiddle(true));
                     if (dist < closestdist) { closestdist = dist; closest = new Point(x, y); }
                 }
             }
@@ -774,7 +796,7 @@ namespace Roleplay
         {
             for (int i = 0; i < buttons.Count; i++)
             {
-                if(buttons[i].getFrame().Contains(mousePos) && IsleftClicking())
+                if(buttons[i].getFrame(false).Contains(mousePos) && IsleftClicking())
                 {
                     switch (buttons[i].action)
                     {
@@ -863,7 +885,20 @@ namespace Roleplay
             if (kbs.IsKeyDown(Keys.Right)) { translation.X -= translationSpeed; }
         }  
 
-        //draw       
+        //draw      
+        void DrawOverlay()
+        {
+            foreach(Tile t in ts.tiles)
+            {
+                foreach (Point p in currentRange)
+                {
+                    if (t.tsPos == p)
+                    {
+                        overlay.Draw(spriteBatch, t.pos, zoom, true);
+                    }
+                }
+            }
+        } //temp?
         void DrawButtons()
         {
             foreach(Button b in buttons)
@@ -886,6 +921,9 @@ namespace Roleplay
                 lastTile().Draw(spriteBatch,1f);
                 nextTile().Draw(spriteBatch,1f);
                 currentTile().Draw(spriteBatch,1f);
+
+                if (ts.tiles[mouseTsPos().X, mouseTsPos().Y] != null)
+                    fDrawer.DrawText(Vector2.Zero, ""+mouseTsPos(), 1000, 1000, spriteBatch, 1f);
             }
         }
         void DrawEditor()
@@ -917,6 +955,12 @@ namespace Roleplay
                 ts.Draw(spriteBatch, zoom);
                 guy.Draw(spriteBatch, zoom);
                 enemy.Draw(spriteBatch, zoom);
+
+                //range overlay
+                if (gim == GameInputMode.MoveActor || gim == GameInputMode.CastSkill)
+                {
+                    DrawOverlay();
+                }
             }
             else {             
                 DrawActorStats();
@@ -929,6 +973,7 @@ namespace Roleplay
                 {
                     DrawSkillCasting();
                 }
+                
                 DrawGameDebugInfo();
             }
         }

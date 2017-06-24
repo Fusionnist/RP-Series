@@ -1,10 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Root>
   <Textures src="Tiles" id="0">
-    <Texture id="3" anim ="false" name="test1" fa="R" x="0" y="0" w="200" h="100"> </Texture>
-    <Texture id="4" anim ="false" name="test2" fa="R" x="200" y="0" w="200" h="100"> </Texture>
-    <Texture id="5" anim ="false" name="test3" fa="R" x="400" y="0" w="200" h="100"> </Texture>
-    <Texture id="6" anim ="false" name="test4" fa="R" x="600" y="0" w="200" h="100"> </Texture>
+    <Texture id="3" anim ="false" fa="R" x="0" y="0" w="200" h="100"> </Texture>
+    <Texture id="4" anim ="false" fa="R" x="200" y="0" w="200" h="100"> </Texture>
+    <Texture id="5" anim ="false" fa="R" x="400" y="0" w="200" h="100"> </Texture>
+    <Texture id="6" anim ="false" fa="R" x="600" y="0" w="200" h="100"> </Texture>
+  </Textures>
+  
+  <Textures src="tileset3" id="2">
+    <Texture id="7" anim ="false" fa="R" x="0" y="0" w="32" h="16"> </Texture>
+    <Texture id="8" anim ="false" fa="R" x="32" y="0" w="32" h="16"> </Texture>
+    <Texture id="9" anim ="false" fa="R" x="64" y="0" w="32" h="16"> </Texture>
+    <Texture id="10" anim ="false" fa="R" x="96" y="0" w="32" h="16"> </Texture>
+    <Texture id="11" anim ="false" fa="R" x="128" y="0" w="32" h="16"> </Texture>
+    <Texture id="12" anim ="false" fa="R" x="160" y="0" w="32" h="16"> </Texture>
+    <Texture id="13" anim ="false" fa="R" x="192" y="0" w="32" h="16"> </Texture>
+    <Texture id="14" anim ="false" fa="R" x="224" y="0" w="32" h="16"> </Texture>
+    <Texture id="15" anim ="false" fa="R" x="256" y="0" w="32" h="16"> </Texture>
+    <Texture id="16" anim ="false" fa="R" x="288" y="0" w="32" h="16"> </Texture>
   </Textures>
   
   <Textures src="testSheet" id="1">

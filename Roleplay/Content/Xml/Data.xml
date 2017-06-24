@@ -22,5 +22,35 @@
     <Tile name="rock" id="3">
       <Texture id="6" name="normal"></Texture>
     </Tile>
+    <Tile name="rock" id="4">
+      <Texture id="7" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="5">
+      <Texture id="8" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="6">
+      <Texture id="9" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="7">
+      <Texture id="10" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="8">
+      <Texture id="11" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="9">
+      <Texture id="12" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="10">
+      <Texture id="13" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="11">
+      <Texture id="14" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="12">
+      <Texture id="15" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="13">
+      <Texture id="16" name="normal"></Texture>
+    </Tile>
   </Tiles>
 </Data>

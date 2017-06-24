@@ -16,6 +16,7 @@ namespace Roleplay
         float frameTime, frameTimer;
         public int ID;
         public string name;
+        public bool resizeToTile;
 
         public void GetName(string name_)
         {
@@ -55,9 +56,20 @@ namespace Roleplay
             frame = new Rectangle(sourceRect.X + frameCounter * sourceRect.Width, sourceRect.Y, sourceRect.Width, sourceRect.Height);
             sb_.Draw(source, sourceRectangle: frame, position: pos_*zoom_,scale:new Vector2(zoom_) * (resizer));            
         }
-        public Vector2 getMiddle()
+        public Vector2 getMiddle(bool resizes)
         {
-            return new Vector2(frame.Width / 2, frame.Height / 2);
+            return new Vector2(getFrame(resizes).Width / 2, getFrame(resizes).Height / 2);
+        }
+        public Rectangle getFrame(bool shouldResize)
+        {
+            float scale = 1f;
+            if (shouldResize) { scale = 200f / frame.Width; }
+            Rectangle r = new Rectangle(
+                0,
+                0,
+                (int)(frame.Width*scale),
+                (int)(frame.Height*scale));
+            return r;
         }
     }
 }

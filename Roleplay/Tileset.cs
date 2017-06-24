@@ -32,7 +32,7 @@ namespace Roleplay
             {
                 for (int y = 0; y < height; y++)
                 {
-                    tiles[x, y].pos = new Vector2(x * 101 - y * 101, x * 51 + y * 51);
+                    tiles[x, y].pos = new Vector2(x * 100 - y * 100, x * 51 + y * 51);
                     tiles[x, y].tsPos = new Point(x, y);
                 }
             }

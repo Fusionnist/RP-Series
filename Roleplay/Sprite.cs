@@ -21,16 +21,16 @@ namespace Roleplay
         {
             tex.Update(gt_);
         }
-        public Rectangle getFrame()
+        public Rectangle getFrame(bool resized)
         {
-            Rectangle rec = tex.frame;
+            Rectangle rec = tex.getFrame(resized);
             rec.X = (int)pos.X;
             rec.Y = (int)pos.Y;
             return rec;
         }
-        public Vector2 getMiddle()
+        public Vector2 getMiddle(bool resizes)
         {
-            return(tex.getMiddle() + pos);
+            return(tex.getMiddle(resizes) + pos);
         }
     }
 }
