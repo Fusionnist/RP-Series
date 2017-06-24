@@ -1,36 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Root>
-  <Textures src="Tiles" name="test">
-    <Texture anim ="false" name="test1" fa="R" x="0" y="0" w="200" h="100"> </Texture>
-    <Texture anim ="false" name="test2" fa="R" x="200" y="0" w="200" h="100"> </Texture>
-    <Texture anim ="false" name="test3" fa="R" x="400" y="0" w="200" h="100"> </Texture>
-    <Texture anim ="false" name="test4" fa="R" x="600" y="0" w="200" h="100"> </Texture>
-    <Texture anim ="false" name="redChair" fa="R" x="0" y="100" w="60" h="120"> </Texture>
-    <Tilesheet>
-      <Tile tname="test1" name="rock1"></Tile>
-      <Tile tname="test2" name="grass1"></Tile>
-      <Tile tname="test3" name="rock2"></Tile>
-      <Tile tname="test4" name="water1"></Tile>
-    </Tilesheet>
-    <Creatures>
-      <Creature  name="redChair" hp="5" maxhp="110" active="false">
-        <Texture tname="redChair" name="idle"></Texture>
-      </Creature>
-    </Creatures>
+  <Textures src="Tiles" id="0">
+    <Texture id="3" anim ="false" name="test1" fa="R" x="0" y="0" w="200" h="100"> </Texture>
+    <Texture id="4" anim ="false" name="test2" fa="R" x="200" y="0" w="200" h="100"> </Texture>
+    <Texture id="5" anim ="false" name="test3" fa="R" x="400" y="0" w="200" h="100"> </Texture>
+    <Texture id="6" anim ="false" name="test4" fa="R" x="600" y="0" w="200" h="100"> </Texture>
   </Textures>
   
-  <Textures src="testSheet" name="testAssets">
-    <Texture anim ="false" name="jalapeno" fa="R" x="40" y="0" w="20" h="40"> </Texture>
-    <Texture anim ="false" name="booperino" fa="R" x="0" y="0" w="40" h="40"> </Texture>
-    <Texture anim ="false" name="sadBooperino" fa="R" x="0" y="40" w="40" h="40"> </Texture>
-    <Creatures>
-      <Creature name="jalapeno" hp="5" maxhp="110" active="true">
-        <Texture tname="jalapeno" name="idle"></Texture>
-      </Creature>
-      <Creature name ="booperino" hp="1" maxhp="10" active="true">
-        <Texture tname="booperino" name="idle"></Texture>
-        <Texture tname ="sadBooperino" name="dead"></Texture>
-      </Creature>
-    </Creatures>
+  <Textures src="testSheet" id="1">
+    <Texture id="0" anim ="false" name="jalapeno" fa="R" x="40" y="0" w="20" h="40"> </Texture>
+    <Texture id="1" anim ="false" name="booperino" fa="R" x="0" y="0" w="40" h="40"> </Texture>
+    <Texture id="2" anim ="false" name="sadBooperino" fa="R" x="0" y="40" w="40" h="40"> </Texture>
   </Textures>
 </Root>

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Roleplay
+﻿namespace Roleplay
 {
     public class CreatureSheet
     {
@@ -13,13 +7,15 @@ namespace Roleplay
         public bool[] isActive;
 
         public string[] names;
-        public string[][] tnames;
+        public int[] IDs;
+        public int[][] tIDs;
         public string[][] tuses;
 
-        public CreatureSheet(int[] hp_, int[] maxHp_, string[] names_, bool[] isActive_, string[][] tnames_, string[][] tuses_)
+        public CreatureSheet(int[] hp_, int[] maxHp_, string[] names_, bool[] isActive_, int[][] tIDs_, string[][] tuses_, int[] IDs_)
         {
+            IDs = IDs_;
             tuses = tuses_;
-            tnames = tnames_;
+            tIDs = tIDs_;
             maxhp = maxHp_;
             hp = hp_;
             names = names_;

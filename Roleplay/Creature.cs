@@ -13,7 +13,7 @@ namespace Roleplay
         public int maxAP, AP;
         public int hp, maxHp;
         public bool isPlayer, isActive;
-        public Creature(MagicTexture[] tex_, Vector2 pos_, Point tsPos_, int hp_, int maxHp_, string name_, List<Skill> skills_, bool isActive_, int maxAP_) : base(tex_[0], pos_, tsPos_)
+        public Creature(MagicTexture[] tex_, Vector2 pos_, Point tsPos_, int hp_, int maxHp_, string name_, List<Skill> skills_, bool isActive_, int maxAP_, int ID_) : base(tex_[0], pos_, tsPos_, ID_)
         {
             skills = skills_;
             name = name_;

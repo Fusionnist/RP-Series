@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Campaign>
+  <Tileset path ="Content/Xml/TestTileset.xml"></Tileset>
+  <Data path ="Content/Xml/Data.xml"></Data>
+  <Textures path ="Content/Xml/TextureData.xml"></Textures>
+</Campaign>

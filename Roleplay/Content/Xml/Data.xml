@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Data>
+  <Creatures>
+    <Creature id="0" name="jalapeno" hp="5" maxhp="110" active="true">
+      <Texture id="0" name="idle"></Texture>
+    </Creature>
+    <Creature id="1" name ="booperino" hp="1" maxhp="10" active="true">
+      <Texture id="1" name="idle"></Texture>
+      <Texture id="2" name="dead"></Texture>
+    </Creature>
+  </Creatures>
+  <Tiles>
+    <Tile name="rock" id="0">
+      <Texture id="3" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="1">
+      <Texture id="4" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="2">
+      <Texture id="5" name="normal"></Texture>
+    </Tile>
+    <Tile name="rock" id="3">
+      <Texture id="6" name="normal"></Texture>
+    </Tile>
+  </Tiles>
+</Data>

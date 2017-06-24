@@ -7,8 +7,10 @@ namespace Roleplay
     public class Entity:Sprite
     {
         public Point tsPos;
-        public Entity(MagicTexture tex_, Vector2 pos_, Point tsPos_) : base(tex_, pos_)
+        public int ID;
+        public Entity(MagicTexture tex_, Vector2 pos_, Point tsPos_, int ID_) : base(tex_, pos_)
         {
+            ID = ID_;
             tsPos = tsPos_;
         }
         public override void Draw(SpriteBatch sb_, float zoom_)

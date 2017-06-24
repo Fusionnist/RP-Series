@@ -41,7 +41,7 @@ namespace Roleplay
         //values
         public float zoom;
         //data
-        List<SpriteSheet> sheets;
+        SpriteSheet sheet;
         public int sheetIndex;
 
         //editor
@@ -86,9 +86,8 @@ namespace Roleplay
             rt = new RenderTarget2D(GraphicsDevice, virtDim.X, virtDim.Y);
             nonTransRt = new RenderTarget2D(GraphicsDevice, virtDim.X, virtDim.Y);
             base.Initialize();
-            sheets = new List<SpriteSheet>();
-            sheets.Add(new SpriteSheet("Content/Xml/TextureData.xml", Content, "testAssets"));
-            sheets.Add(new SpriteSheet("Content/Xml/TextureData.xml", Content, "test"));
+
+            sheet = new SpriteSheet(XDocument.Load("Content/Xml/Campaign.xml"), Content);
 
             SetupKeys();
             ResizeWindow();
@@ -97,7 +96,7 @@ namespace Roleplay
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            cursor = new MagicTexture(Content.Load<Texture2D>("cursor"), new Rectangle(0, 0, 100, 100), Facing.L, string.Empty, string.Empty);
+            cursor = new MagicTexture(Content.Load<Texture2D>("cursor"), new Rectangle(0, 0, 100, 100), Facing.L, 0);
             tex = Content.Load<Texture2D>("grad");
 
             buttons = new List<Button>();
@@ -117,9 +116,9 @@ namespace Roleplay
         {
             tileIndex = 0;
             List<Tile> editorTileList = new List<Tile>();
-            for (int i = 0; i < currentSheet().tileSheet.tileNames.Length; i++)
+            for (int i = 0; i < sheet.tileSheet.tileNames.Length; i++)
             {
-                editorTileList.Add(GetTile(currentSheet().tileSheet.tileNames[i], currentSheet().name));
+                editorTileList.Add(GetTile(sheet.tileSheet.tileIDs[i]));
             }
             editorTiles = editorTileList.ToArray();
             SetQuickAccessTiles();
@@ -127,7 +126,6 @@ namespace Roleplay
         void SetupTSE()
         {
             tseMode = TSEMode.Edit;
-            TargetSheet("test");
             SetupSheet();         
             ts = GetTileset();
             SetQuickAccessTiles();
@@ -136,7 +134,7 @@ namespace Roleplay
         }
         void SetupMenu()
         {
-            MagicTexture test2 = new MagicTexture(tex, new Rectangle(0, 0, tex.Width, tex.Height), Facing.N, string.Empty, string.Empty);
+            MagicTexture test2 = new MagicTexture(tex, new Rectangle(0, 0, tex.Width, tex.Height), Facing.N, 0);
 
             buttons.Clear();
             buttons.Add(new Button(test2, new Vector2(300, 100), "TilesetEditor"));
@@ -149,14 +147,13 @@ namespace Roleplay
 
             ts = GetTileset();
 
-            TargetSheet("testAssets");
-            guy = currentSheet().getCreature("jalapeno");
+            guy = sheet.getCreature(0);
             guy.BecomePlayer();
             guy.LearnSkill(new Skill(SkillTrajectory.Linear, 4, 10, "skill1", 1));
             guy.LearnSkill(new Skill(SkillTrajectory.Linear, 5, 1, "skill2 lol", 1));
             guy.tsPos = new Point(2, 2);
             PositionToTile(guy);
-            enemy = currentSheet().getCreature("booperino");
+            enemy = sheet.getCreature(1);
             enemy.LearnSkill(new Skill(SkillTrajectory.Linear, 5, 1, "skill2 lol", 1));
 
             actors = new List<Creature>();
@@ -210,7 +207,7 @@ namespace Roleplay
             {
                 int x = int.Parse(tile.Attribute("x").Value);
                 int y = int.Parse(tile.Attribute("y").Value);
-                tiles2[x, y] = GetTile(tile.Value, tile.Attribute("sheet").Value);
+                tiles2[x, y] = GetTile(int.Parse(tile.Value));
             }
             
             return new Tileset(tiles2, tx, ty, 200,100);
@@ -259,17 +256,16 @@ namespace Roleplay
                 {
                     for (int y = 0; y < oH + modder.Y; y++)
                     {
-                        if (newTiles[x, y] == null) { newTiles[x, y] = GetTile(currentSheet().tileSheet.tileNames[tileIndex], currentSheet().name); }
+                        if (newTiles[x, y] == null) { newTiles[x, y] = GetTile(sheet.tileSheet.tileIDs[tileIndex]); }
                     }
                 }
                 return new Tileset(newTiles, oW + modder.X, oH + modder.Y, 200, 100);
             }
             return ts_;
         }
-        public Tile GetTile(string tilename_, string sheetName_)
+        public Tile GetTile(int ID_)
         {
-            TargetSheet(sheetName_);
-            return currentSheet().getTile(tilename_);      
+            return sheet.getTile(ID_);      
         }
         public Vector2 getMousePos()
         {
@@ -277,7 +273,7 @@ namespace Roleplay
         }
         public Tile nextTile()
         {
-            if (tileIndex + 1 >= currentSheet().tileSheet.tileTNames.Length)
+            if (tileIndex + 1 >= sheet.tileSheet.tileTIDs.Length)
                 return editorTiles[0];
             else
                 return editorTiles[tileIndex + 1];
@@ -285,17 +281,13 @@ namespace Roleplay
         public Tile lastTile()
         {
             if (tileIndex - 1 < 0)
-                return editorTiles[currentSheet().tileSheet.tileTNames.Length - 1];
+                return editorTiles[sheet.tileSheet.tileTIDs.Length - 1];
             else
                 return editorTiles[tileIndex - 1];
         }
         public Tile currentTile()
         {
             return editorTiles[tileIndex];
-        }
-        public SpriteSheet currentSheet()
-        {
-            return (sheets[sheetIndex]);
         }
         public Point[] pointsInRange(Point p_, int i)
         {
@@ -341,12 +333,11 @@ namespace Roleplay
                 {
                     XElement tileEl = new XElement("Tile");
 
-                    string name = ts.tiles[x, y].name;
-                    tileEl.SetValue(name);
+                    int id = ts.tiles[x, y].ID;
+                    tileEl.SetValue(id);
 
                     tileEl.Add(new XAttribute("x", x));
                     tileEl.Add(new XAttribute("y", y));
-                    tileEl.Add(new XAttribute("sheet", ts.tiles[x,y].tex.sheetName));
 
                     tilesetEl.Add(tileEl);
                 }
@@ -460,11 +451,11 @@ namespace Roleplay
             }
             if (actors[actorKey].isPlayer)
             {
-                MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty, string.Empty);
+                MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, 0);
                 buttons.Add(new Button(tex, new Vector2(920, 980), "EndTurn"));
-                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty, string.Empty);
+                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, 0);
                 buttons.Add(new Button(tex, new Vector2(920, 880), "SelectSkill"));
-                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty, string.Empty);
+                tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, 0);
                 buttons.Add(new Button(tex, new Vector2(920, 700), "MoveActor"));
             }
         } //adds or removes buttons based on the current actor
@@ -525,7 +516,7 @@ namespace Roleplay
             {
                 for (int x = 0; x < actors[actorKey].skills.Count; x++)
                 {
-                    MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, string.Empty, string.Empty);
+                    MagicTexture tex = new MagicTexture(Content.Load<Texture2D>("grad"), new Rectangle(0, 0, 1000, 100), Facing.N, 0);
                     buttons.Add(new Button(tex, new Vector2(920, 0 + (x * 100)), "SelectSkillKey", actors[actorKey].skills[x].name, x));
                 }
             }
@@ -592,7 +583,6 @@ namespace Roleplay
                     UpdateTSESelect();
                     break;
             }
-            if (GetPressed("toggleSheet")) { SelectNextSheet(); }
             if (GetPressed("save")) { SaveTileset(); }
             if (GetPressed("menu")) { gm = GameMode.Menus; SetupMenu(); }
         }
@@ -616,10 +606,10 @@ namespace Roleplay
         }
         public void ToggleSelectedTile()
         {
-            if (tileIndex >= currentSheet().tileSheet.tileTNames.Length)
+            if (tileIndex >= sheet.tileSheet.tileTIDs.Length)
             { tileIndex = 0; }
             if (tileIndex < 0)
-            { tileIndex = currentSheet().tileSheet.tileTNames.Length - 1; }
+            { tileIndex = sheet.tileSheet.tileTIDs.Length - 1; }
             SetQuickAccessTiles();
 
             SaveTileset();
@@ -689,7 +679,7 @@ namespace Roleplay
                 {
                     if (IsleftClicking())
                     {
-                        ts.tiles[closest.X, closest.Y] = GetTile(currentSheet().tileSheet.tileNames[tileIndex], currentSheet().name);
+                        ts.tiles[closest.X, closest.Y] = GetTile(sheet.tileSheet.tileIDs[tileIndex]);
                         ts.PlaceTiles();
                     }
                 }
@@ -818,17 +808,6 @@ namespace Roleplay
                 }
             }
         }
-        void TargetSheet(string name_)
-        {
-            for(int i = 0; i < sheets.Count; i++)
-            {
-                if(sheets[i].name == name_)
-                {
-                    sheetIndex = i;
-                    break;
-                }
-            }
-        }
         void UpdateKeys()
         {
             foreach(KeyLogger kl in keys) { kl.Update(kbs); }
@@ -886,13 +865,7 @@ namespace Roleplay
             if (kbs.IsKeyDown(Keys.Down)) { translation.Y -= translationSpeed; }
             if (kbs.IsKeyDown(Keys.Left)) { translation.X += translationSpeed; }
             if (kbs.IsKeyDown(Keys.Right)) { translation.X -= translationSpeed; }
-        }
-        public void SelectNextSheet()
-        {
-            sheetIndex++;
-            if(sheetIndex >= sheets.Count) { sheetIndex = 0; }
-            SetupSheet();
-        }      
+        }  
 
         //draw       
         void DrawButtons()
