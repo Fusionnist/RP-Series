@@ -13,14 +13,14 @@ namespace Roleplay
         public Texture2D[] sourceTex;
 
         //tex
-        public int[] srcIDs;
-        public int[] mTexIDs;
-        public Rectangle[] sourceRects;
-        public Facing[] facing;
+        public List<int> srcIDs;
+        public List<int> mTexIDs;
+        public List<Rectangle> sourceRects;
+        public List<Facing> facing;
         //anim
-        public bool[] isAnimated;
-        public float[] frameTime;
-        public int[] frameCount;
+        public List<bool> isAnimated;
+        public List<float> frameTime;
+        public List<int> frameCount;
 
         public SpriteSheet(XDocument campaignDoc, ContentManager c_)
         {
@@ -77,13 +77,13 @@ namespace Roleplay
                 }//gets and adds all tex values
 
                 sourceTex = sourceTexL.ToArray();
-                srcIDs = srcIDsL.ToArray();
-                mTexIDs = mTexIDsL.ToArray();
-                sourceRects = sourceRectsL.ToArray();
-                facing = facingL.ToArray();
-                isAnimated = isAnimatedL.ToArray();
-                frameTime = frameTimeL.ToArray();
-                frameCount = frameCountL.ToArray();
+                srcIDs = srcIDsL;
+                mTexIDs = mTexIDsL;
+                sourceRects = sourceRectsL;
+                facing = facingL;
+                isAnimated = isAnimatedL;
+                frameTime = frameTimeL;
+                frameCount = frameCountL;
             }
 
             XDocument dDoc = XDocument.Load(campaignDoc.Element("Campaign").Element("Data").Attribute("path").Value);
@@ -93,11 +93,11 @@ namespace Roleplay
                 List<int> maxhp = new List<int>();
                 List<int> hp = new List<int>();
                 List<bool> isActive = new List<bool>();
-
+                List<int> maxap = new List<int>();
                 List<string> names = new List<string>();
                 List<int> IDs = new List<int>();
-                List<int[]> tIDs = new List<int[]>();
-                List<string[]> tuses = new List<string[]>();
+                List<List<int>> tIDs = new List<List<int>>();
+                List<List<string>> tuses = new List<List<string>>();
 
                 foreach (XElement El in dDoc.Element("Data").Element("Creatures").Elements("Creature"))
                 {
@@ -106,6 +106,7 @@ namespace Roleplay
                     IDs.Add(int.Parse(El.Attribute("id").Value));
                     isActive.Add(bool.Parse(El.Attribute("active").Value));
                     names.Add(El.Attribute("name").Value);
+                    maxap.Add(int.Parse(El.Attribute("maxap").Value));
 
                     List<int> tIDsA = new List<int>();
                     List<string> tusesA = new List<string>();
@@ -116,17 +117,18 @@ namespace Roleplay
                         tusesA.Add(tEl.Attribute("name").Value);
                     }
 
-                    tIDs.Add(tIDsA.ToArray());
-                    tuses.Add(tusesA.ToArray());
+                    tIDs.Add(tIDsA);
+                    tuses.Add(tusesA);
                 }
                 crSheet = new CreatureSheet(
-                    hp.ToArray(),
-                    maxhp.ToArray(),
-                    names.ToArray(),
-                    isActive.ToArray(),
-                    tIDs.ToArray(),
-                    tuses.ToArray(),
-                    IDs.ToArray());
+                    hp,
+                    maxhp,
+                    names,
+                    isActive,
+                    tIDs,
+                    tuses,
+                    IDs,
+                    maxap);
             }
 
             //tile data
@@ -141,18 +143,17 @@ namespace Roleplay
                     tileIDs.Add(int.Parse(El.Attribute("id").Value));
                     tileNames.Add(El.Attribute("name").Value);
                 }
-                tileSheet = new TileSheet(tileTIDs.ToArray(), tileNames.ToArray(), tileIDs.ToArray());
+                tileSheet = new TileSheet(tileTIDs, tileNames, tileIDs);
             }
-
         }
         public Creature getCreature(int ID_)
         {
-            for(int x = 0; x < crSheet.IDs.Length; x++)
+            for(int x = 0; x < crSheet.IDs.Count; x++)
             {
                 if (crSheet.IDs[x] == ID_)
                 {
                     List<MagicTexture> ts = new List<MagicTexture>();
-                    for (int y = 0; y < crSheet.tIDs[x].Length; y++)
+                    for (int y = 0; y < crSheet.tIDs[x].Count; y++)
                     {
                         ts.Add(getTex(crSheet.tIDs[x][y]));
                         ts[y].GetName(crSheet.tuses[x][y]);
@@ -166,7 +167,7 @@ namespace Roleplay
                         crSheet.names[x],
                         new List<Skill>(),
                         crSheet.isActive[x],
-                        5,
+                        crSheet.maxap[x],
                         ID_
                         );
                 }
@@ -175,7 +176,7 @@ namespace Roleplay
         }
         public Tile getTile(int ID_)
         {
-            for(int x = 0; x < tileSheet.tileIDs.Length; x++)
+            for(int x = 0; x < tileSheet.tileIDs.Count; x++)
             {
                 if(tileSheet.tileIDs[x] == ID_)
                 {
@@ -193,7 +194,7 @@ namespace Roleplay
 
         public MagicTexture getTex(int ID)
         {
-            for(int i = 0; i < mTexIDs.Length; i++)
+            for(int i = 0; i < mTexIDs.Count; i++)
             {
                 if(ID == mTexIDs[i]) {
                     if (isAnimated[i])

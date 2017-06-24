@@ -19,5 +19,10 @@ namespace Roleplay
             key = key_;
             action = action_;
         }
+        public void Draw(SpriteBatch sb_, float zoom_, FontDrawer fd)
+        {
+            base.Draw(sb_, zoom_);
+            fd.DrawText(pos, action, 1000, 1000, sb_, 1f);
+        }
     }
 }

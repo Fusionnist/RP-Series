@@ -116,9 +116,9 @@ namespace Roleplay
         {
             tileIndex = 0;
             List<Tile> editorTileList = new List<Tile>();
-            for (int i = 0; i < sheet.tileSheet.tileNames.Length; i++)
+            for (int i = 0; i < sheet.tileSheet.tileNames.Count; i++)
             {
-                editorTileList.Add(GetTile(sheet.tileSheet.tileIDs[i]));
+                editorTileList.Add(sheet.getTile(sheet.tileSheet.tileIDs[i]));
             }
             editorTiles = editorTileList.ToArray();
             SetQuickAccessTiles();
@@ -207,7 +207,7 @@ namespace Roleplay
             {
                 int x = int.Parse(tile.Attribute("x").Value);
                 int y = int.Parse(tile.Attribute("y").Value);
-                tiles2[x, y] = GetTile(int.Parse(tile.Value));
+                tiles2[x, y] = sheet.getTile(int.Parse(tile.Value));
             }
             
             return new Tileset(tiles2, tx, ty, 200,100);
@@ -256,16 +256,12 @@ namespace Roleplay
                 {
                     for (int y = 0; y < oH + modder.Y; y++)
                     {
-                        if (newTiles[x, y] == null) { newTiles[x, y] = GetTile(sheet.tileSheet.tileIDs[tileIndex]); }
+                        if (newTiles[x, y] == null) { newTiles[x, y] = sheet.getTile(sheet.tileSheet.tileIDs[tileIndex]); }
                     }
                 }
                 return new Tileset(newTiles, oW + modder.X, oH + modder.Y, 200, 100);
             }
             return ts_;
-        }
-        public Tile GetTile(int ID_)
-        {
-            return sheet.getTile(ID_);      
         }
         public Vector2 getMousePos()
         {
@@ -273,7 +269,7 @@ namespace Roleplay
         }
         public Tile nextTile()
         {
-            if (tileIndex + 1 >= sheet.tileSheet.tileTIDs.Length)
+            if (tileIndex + 1 >= sheet.tileSheet.tileTIDs.Count)
                 return editorTiles[0];
             else
                 return editorTiles[tileIndex + 1];
@@ -281,7 +277,7 @@ namespace Roleplay
         public Tile lastTile()
         {
             if (tileIndex - 1 < 0)
-                return editorTiles[sheet.tileSheet.tileTIDs.Length - 1];
+                return editorTiles[sheet.tileSheet.tileTIDs.Count - 1];
             else
                 return editorTiles[tileIndex - 1];
         }
@@ -606,10 +602,10 @@ namespace Roleplay
         }
         public void ToggleSelectedTile()
         {
-            if (tileIndex >= sheet.tileSheet.tileTIDs.Length)
+            if (tileIndex >= sheet.tileSheet.tileTIDs.Count)
             { tileIndex = 0; }
             if (tileIndex < 0)
-            { tileIndex = sheet.tileSheet.tileTIDs.Length - 1; }
+            { tileIndex = sheet.tileSheet.tileTIDs.Count - 1; }
             SetQuickAccessTiles();
 
             SaveTileset();
@@ -679,7 +675,7 @@ namespace Roleplay
                 {
                     if (IsleftClicking())
                     {
-                        ts.tiles[closest.X, closest.Y] = GetTile(sheet.tileSheet.tileIDs[tileIndex]);
+                        ts.tiles[closest.X, closest.Y] = sheet.getTile(sheet.tileSheet.tileIDs[tileIndex]);
                         ts.PlaceTiles();
                     }
                 }
@@ -872,7 +868,7 @@ namespace Roleplay
         {
             foreach(Button b in buttons)
             {
-                b.Draw(spriteBatch, 1f);
+                b.Draw(spriteBatch, 1f, fDrawer);
             }
         }
         void DrawTSESelect()
@@ -913,13 +909,7 @@ namespace Roleplay
         }
         void DrawSkillSelect()
         {
-            for(int x = 0; x < buttons.Count; x++)
-            {
-                if(buttons[x].action == "SelectSkillKey")
-                {
-                    fDrawer.DrawText(buttons[x].pos, buttons[x].keyname, 1080, 1920, spriteBatch, 1);
-                }
-            }
+
         }
         void DrawGame() {
             if (dPhase == DrawPhase.Trans)

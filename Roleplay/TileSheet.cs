@@ -10,9 +10,9 @@ namespace Roleplay
 {
     public class TileSheet
     {
-        public int[] tileTIDs, tileIDs;
-        public string[] tileNames;
-        public TileSheet(int[] tileTIDs_, string[] names_, int[] tileIDs_)
+        public List<int> tileTIDs, tileIDs;
+        public List<string> tileNames;
+        public TileSheet(List<int> tileTIDs_, List<string> names_, List<int> tileIDs_)
         {
             tileNames = names_;
             tileTIDs = tileTIDs_;

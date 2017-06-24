@@ -1,18 +1,22 @@
-﻿namespace Roleplay
+﻿using System.Collections.Generic;
+
+namespace Roleplay
 {
     public class CreatureSheet
     {
-        public int[] maxhp;
-        public int[] hp;
-        public bool[] isActive;
+        public List<int> maxap;
+        public List<int> maxhp;
+        public List<int> hp;
+        public List<bool> isActive;
 
-        public string[] names;
-        public int[] IDs;
-        public int[][] tIDs;
-        public string[][] tuses;
+        public List<string> names;
+        public List<int> IDs;
+        public List<List<int>> tIDs;
+        public List<List<string>> tuses;
 
-        public CreatureSheet(int[] hp_, int[] maxHp_, string[] names_, bool[] isActive_, int[][] tIDs_, string[][] tuses_, int[] IDs_)
+        public CreatureSheet(List<int> hp_, List<int> maxHp_, List<string> names_, List<bool> isActive_, List<List<int>> tIDs_, List<List<string>> tuses_, List<int> IDs_, List<int> maxap_)
         {
+            maxap = maxap_;
             IDs = IDs_;
             tuses = tuses_;
             tIDs = tIDs_;
