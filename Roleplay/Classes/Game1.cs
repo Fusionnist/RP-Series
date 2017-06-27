@@ -60,7 +60,7 @@ namespace Roleplay
         int skillKey;
         //draw tools
         FontDrawer fDrawer;
-
+        FrameDrawer frDrawer;
         //general
         List<Button> buttons;
         
@@ -111,6 +111,19 @@ namespace Roleplay
             overlay = new MagicTexture(Content.Load<Texture2D>("overlay"), new Rectangle(0, 0, 200, 100), Facing.N, 0);
 
             SetupMenu();
+
+            Texture2D frameSrc = Content.Load<Texture2D>("frame");
+            MagicTexture UL = new MagicTexture(frameSrc, new Rectangle(0, 0, 30, 30), Facing.N, 0);
+            MagicTexture UR = new MagicTexture(frameSrc, new Rectangle(60, 0, 30, 30), Facing.N, 0);
+            MagicTexture L = new MagicTexture(frameSrc, new Rectangle(0, 30, 30, 30), Facing.N, 0);
+            MagicTexture R = new MagicTexture(frameSrc, new Rectangle(60, 30, 30, 30), Facing.N, 0);
+            MagicTexture DL = new MagicTexture(frameSrc, new Rectangle(0, 60, 30, 30), Facing.N, 0);
+            MagicTexture DR = new MagicTexture(frameSrc, new Rectangle(60, 60, 30, 30), Facing.N, 0);
+            MagicTexture U = new MagicTexture(frameSrc, new Rectangle(30, 0, 30, 30), Facing.N, 0);
+            MagicTexture D = new MagicTexture(frameSrc, new Rectangle(30, 60, 30, 30), Facing.N, 0);
+            MagicTexture M = new MagicTexture(frameSrc, new Rectangle(30, 30, 30, 30), Facing.N, 0);
+            frDrawer = new FrameDrawer();
+            frDrawer.GetStyle(UL, UR, L, R, DL, DR, U, D, M);
         }
         protected override void UnloadContent()
         {
@@ -1002,6 +1015,7 @@ namespace Roleplay
             else {
                 fDrawer.DrawText(Vector2.Zero, "test text!", 400, 400, spriteBatch, 0.5f);
                 DrawButtons();
+                frDrawer.Draw(new Rectangle(400, 400, 400, 600), spriteBatch);
             }
 
         }
