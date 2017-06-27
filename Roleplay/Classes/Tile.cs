@@ -12,5 +12,9 @@ namespace Roleplay
         {
             name = name_;
         }
+        public Rectangle GetBaseRect()
+        {
+            return new Rectangle((int)pos.X, (int)pos.Y, 100, 50);
+        }
     }
 }

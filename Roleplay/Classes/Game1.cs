@@ -414,8 +414,10 @@ namespace Roleplay
         }
         void PositionToTile(Entity ent)
         {
-            ent.pos.Y = ent.tsPos.X * 50 + ent.tsPos.Y * 50 + 100 - (ent.getFrame(true).Height * 200f / ent.getFrame(true).Width);
-            ent.pos.X = ent.tsPos.X * 100 + ent.tsPos.Y * -100;
+            Rectangle R = ts.tiles[ent.tsPos.X, ent.tsPos.Y].GetBaseRect();
+            ent.pos.Y = R.Y + 100 - (ent.getFrame(true).Height * 200f / ent.getFrame(true).Width);
+            ent.pos.X = R.X;
+
         }
         //actor turn stuff
         void Move()

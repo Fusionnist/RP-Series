@@ -52,5 +52,8 @@
     <Tile name="rock" id="13">
       <Texture id="16" name="normal"></Texture>
     </Tile>
+    <Tile name="rock" id="14">
+      <Texture id="17" name="normal"></Texture>
+    </Tile>
   </Tiles>
 </Data>

@@ -18,6 +18,7 @@
     <Texture id="14" anim ="false" fa="R" x="224" y="0" w="32" h="16"> </Texture>
     <Texture id="15" anim ="false" fa="R" x="256" y="0" w="32" h="16"> </Texture>
     <Texture id="16" anim ="false" fa="R" x="288" y="0" w="32" h="16"> </Texture>
+    <Texture id="17" anim ="false" fa="R" x="0" y="16" w="32" h="32"> </Texture>
   </Textures>
   
   <Textures src="testSheet" id="1">
