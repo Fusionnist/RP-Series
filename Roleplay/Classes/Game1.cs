@@ -41,6 +41,7 @@ namespace Roleplay
         //temp values
         MagicTexture overlay;
         Point[] currentRange;
+        Inventory inv;
 
         //values
         public float zoom;
@@ -113,17 +114,27 @@ namespace Roleplay
             SetupMenu();
 
             Texture2D frameSrc = Content.Load<Texture2D>("frame");
-            MagicTexture UL = new MagicTexture(frameSrc, new Rectangle(0, 0, 30, 30), Facing.N, 0);
-            MagicTexture UR = new MagicTexture(frameSrc, new Rectangle(60, 0, 30, 30), Facing.N, 0);
-            MagicTexture L = new MagicTexture(frameSrc, new Rectangle(0, 30, 30, 30), Facing.N, 0);
-            MagicTexture R = new MagicTexture(frameSrc, new Rectangle(60, 30, 30, 30), Facing.N, 0);
-            MagicTexture DL = new MagicTexture(frameSrc, new Rectangle(0, 60, 30, 30), Facing.N, 0);
-            MagicTexture DR = new MagicTexture(frameSrc, new Rectangle(60, 60, 30, 30), Facing.N, 0);
-            MagicTexture U = new MagicTexture(frameSrc, new Rectangle(30, 0, 30, 30), Facing.N, 0);
-            MagicTexture D = new MagicTexture(frameSrc, new Rectangle(30, 60, 30, 30), Facing.N, 0);
-            MagicTexture M = new MagicTexture(frameSrc, new Rectangle(30, 30, 30, 30), Facing.N, 0);
+            List<MagicTexture> style1 = new List<MagicTexture>();
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 0, 30, 30), Facing.N, 0, "UL"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(60, 0, 30, 30), Facing.N, 0,"UR"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 30, 30, 30), Facing.N, 0,"L"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(60, 30, 30, 30), Facing.N, 0,"R"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 60, 30, 30), Facing.N, 0,"DL"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(60, 60, 30, 30), Facing.N, 0,"DR"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 0, 30, 30), Facing.N, 0,"U"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 60, 30, 30), Facing.N, 0,"D"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 30, 30, 30), Facing.N, 0,"M"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 90, 90, 30), Facing.N, 0,"UC"));
             frDrawer = new FrameDrawer();
-            frDrawer.GetStyle(UL, UR, L, R, DL, DR, U, D, M);
+            frDrawer.GetStyle(style1.ToArray());
+
+            inv = new Inventory(10);
+
+            inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor"));
+
+            inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor"));
+
+            inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor"));
         }
         protected override void UnloadContent()
         {
@@ -1015,7 +1026,7 @@ namespace Roleplay
             else {
                 fDrawer.DrawText(Vector2.Zero, "test text!", 400, 400, spriteBatch, 0.5f);
                 DrawButtons();
-                frDrawer.Draw(new Rectangle(400, 400, 400, 600), spriteBatch);
+                inv.Draw(spriteBatch, fDrawer, frDrawer);
             }
 
         }

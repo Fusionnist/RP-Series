@@ -22,13 +22,14 @@ namespace Roleplay
         {
             name = name_;
         }
-        public MagicTexture(Texture2D source_, Rectangle sourceRect_, Facing face_, int ID_)
+        public MagicTexture(Texture2D source_, Rectangle sourceRect_, Facing face_, int ID_, string name_ = null)
         {
             ID = ID_;
             face = face_;
             source = source_;
             sourceRect = sourceRect_;
             frame = sourceRect_;
+            name = name_;
         }
         public MagicTexture(Texture2D source_, Rectangle sourceRect_, Facing face_, int frameCount_, float frameTime_, float delay_, int ID_)
         {
