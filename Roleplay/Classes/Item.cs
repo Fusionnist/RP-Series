@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Roleplay
 {
-    enum ItemType { Consumable, Material, Weapon };
+    public enum ItemType { Consumable, Material, Weapon };
 
     class Item
     {

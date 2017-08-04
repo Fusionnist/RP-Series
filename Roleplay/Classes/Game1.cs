@@ -9,7 +9,7 @@ namespace Roleplay
 {
     enum GameInputMode { ActorMenu, SkillSelect, CastSkill, MoveActor }
     enum GameMode { TilesetEditor, Game, Menus }
-    enum TSEMode { Edit, Select}
+    enum TSEMode { Edit, Select }
     enum DrawPhase {Trans, NonTrans }
     public enum ISODIR { UL,UR,DL,DR }
 
@@ -56,6 +56,7 @@ namespace Roleplay
 
         //game
         List<Creature> actors;
+        List<;
         int actorKey;
         GameInputMode gim;
         int skillKey;
@@ -116,25 +117,19 @@ namespace Roleplay
             Texture2D frameSrc = Content.Load<Texture2D>("frame");
             List<MagicTexture> style1 = new List<MagicTexture>();
             style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 0, 30, 30), Facing.N, 0, "UL"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(60, 0, 30, 30), Facing.N, 0,"UR"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 30, 30, 30), Facing.N, 0,"L"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(60, 30, 30, 30), Facing.N, 0,"R"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 60, 30, 30), Facing.N, 0,"DL"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(60, 60, 30, 30), Facing.N, 0,"DR"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 0, 30, 30), Facing.N, 0,"U"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 60, 30, 30), Facing.N, 0,"D"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 30, 30, 30), Facing.N, 0,"M"));
-            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 90, 90, 30), Facing.N, 0,"UC"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(270, 0, 30, 30), Facing.N, 0,"UR"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 30, 30, 240), Facing.N, 0,"L"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(270, 30, 30, 240), Facing.N, 0,"R"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 270, 30, 30), Facing.N, 0,"DL"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(270, 270, 30, 30), Facing.N, 0,"DR"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 0, 240, 30), Facing.N, 0,"U"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 270, 240, 30), Facing.N, 0,"D"));
+            style1.Add(new MagicTexture(frameSrc, new Rectangle(30, 30, 240, 240), Facing.N, 0,"M"));
+            //style1.Add(new MagicTexture(frameSrc, new Rectangle(0, 90, 90, 30), Facing.N, 0,"UC"));
             frDrawer = new FrameDrawer();
             frDrawer.GetStyle(style1.ToArray());
 
             inv = new Inventory(10);
-
-            inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor"));
-
-            inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor"));
-
-            inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor")); inv.AddItem(new Item(cursor, 0, "cursor"));
         }
         protected override void UnloadContent()
         {
@@ -189,6 +184,8 @@ namespace Roleplay
             actors = new List<Creature>();
             actors.Add(guy);
             actors.Add(enemy);
+
+            actionActors = new List<Creature[]>();
 
             //buttons
             buttons.Clear();

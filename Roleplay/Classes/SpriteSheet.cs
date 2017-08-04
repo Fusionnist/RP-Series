@@ -10,6 +10,7 @@ namespace Roleplay
     {
         public TileSheet tileSheet;
         public CreatureSheet crSheet;
+        public ItemSheet iSheet;
         public List<Texture2D> sourceTex;
         public List<int> srcKeys;
 
@@ -147,6 +148,25 @@ namespace Roleplay
                     tileNames.Add(El.Attribute("name").Value);
                 }
                 tileSheet = new TileSheet(tileTIDs, tileNames, tileIDs);
+
+                List<int> itemIDs = new List<int>();
+                List<int> itemIconIDs = new List<int>();
+                List<string> itemNames = new List<string>();
+                List<List<ItemType>> itemTypes = new List<List<ItemType>>();
+
+                foreach (XElement El in dDoc.Element("Data").Element("Items").Elements("Item"))
+                {
+                    itemIconIDs.Add(int.Parse(El.Attribute("iconID").Value));
+                    itemIDs.Add(int.Parse(El.Attribute("ID").Value));
+                    itemNames.Add(El.Attribute("name").Value);
+                    List<ItemType> types = new List<ItemType>();
+                    foreach(XElement el in El.Elements("Type"))
+                    {
+                        types.Add((ItemType)int.Parse(el.Value));
+                    }
+                    itemTypes.Add(types);
+                }
+                iSheet = new ItemSheet(itemIDs, itemIconIDs, itemTypes, itemNames);
             }
         }
         public Creature getCreature(int ID_)

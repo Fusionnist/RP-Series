@@ -7,6 +7,7 @@
     <Creature id="1" name ="booperino" hp="1" maxhp="10" active="true" maxap="3">
       <Texture id="1" name="idle"></Texture>
       <Texture id="2" name="dead"></Texture>
+      <Texture id="19" name="hit"></Texture>
     </Creature>
   </Creatures>
   <Tiles>
@@ -56,4 +57,10 @@
       <Texture id="17" name="normal"></Texture>
     </Tile>
   </Tiles>
+  <Items>
+    <Item name="wood" ID="0" iconID="18">
+      <Type>0</Type>
+      <Type>2</Type>
+    </Item>
+  </Items>
 </Data>

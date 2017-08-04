@@ -51,6 +51,7 @@
     <Compile Include="Classes\Game1.cs" />
     <Compile Include="Classes\Inventory.cs" />
     <Compile Include="Classes\Item.cs" />
+    <Compile Include="Classes\ItemSheet.cs" />
     <Compile Include="Classes\KeyLogger.cs" />
     <Compile Include="Classes\MagicTexture.cs" />
     <Compile Include="Classes\Program.cs" />
@@ -126,8 +127,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Commands.txt" />
+    <Content Include="Content\booperinoAnim.png" />
     <Content Include="Content\frame.png" />
     <Content Include="Content\overlay.png" />
+    <Content Include="Content\thingIcon.png" />
     <Content Include="Content\tileset3.png" />
     <Content Include="Content\Xml\Campaign.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
