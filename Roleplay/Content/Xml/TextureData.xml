@@ -25,7 +25,7 @@
     <Texture id="0" anim ="false" name="jalapeno" fa="R" x="40" y="0" w="20" h="40"> </Texture>
     <Texture id="1" anim ="false" name="booperino" fa="R" x="0" y="0" w="40" h="40"> </Texture>
     <Texture id="2" anim ="false" name="sadBooperino" fa="R" x="0" y="40" w="40" h="40"> </Texture>
-    <Texture id="19" anim ="false" name="booperinoBounce" fa="R" x="0" y="80" w="32" h="32" ft="1" fc="4"> </Texture>
+    <Texture id="19" anim ="true" name="booperinoBounce" fa="R" x="0" y="80" w="32" h="32" ft="1" fc="4" at="1"> </Texture>
   </Textures>
 
   <Textures src="testSheet" id="3">

@@ -8,6 +8,7 @@ namespace Roleplay
     public class Creature : Entity
     {
         public MagicTexture[] textures;
+        public ActionType currentAction, prevAction;
         public List<Skill> skills;
         public string name;
         public int maxAP, AP;
@@ -26,12 +27,17 @@ namespace Roleplay
 
             textures = tex_;
         }
+        public bool ActionEnded()
+        {
+            return tex.animCompleted;
+        }
         public void SelectTexture(string name)
         {
             foreach(MagicTexture m in textures)
             {
                 if(m.name == name)
                     tex = m;
+                tex.Reset();
             }
         }
         public override void Update(GameTime gt_)
@@ -40,6 +46,20 @@ namespace Roleplay
             { SelectTexture("dead"); }
             ToggleActivity();
             base.Update(gt_);
+            ActionLogic();
+        }
+        void ActionLogic()
+        {           
+            if (currentAction != prevAction)
+            {
+                if(currentAction == ActionType.TakeDamage) { SelectTexture("hit"); }
+                if (currentAction == ActionType.Idle) { SelectTexture("idle"); }
+            }
+            else if (tex.animCompleted)
+            {
+                currentAction = ActionType.Idle;
+            }
+            prevAction = currentAction;
         }
         public void ResetAP()
         {

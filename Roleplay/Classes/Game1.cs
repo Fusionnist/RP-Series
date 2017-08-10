@@ -55,9 +55,10 @@ namespace Roleplay
         TSEMode tseMode;
 
         //game
+        bool actionLock;
         List<Creature> actors;
-        List<;
-        int actorKey;
+        List<SingleAction> actionQueue;
+        int actorKey, actionActorKey;
         GameInputMode gim;
         int skillKey;
         //draw tools
@@ -185,7 +186,7 @@ namespace Roleplay
             actors.Add(guy);
             actors.Add(enemy);
 
-            actionActors = new List<Creature[]>();
+            actionQueue = new List<SingleAction>();
 
             //buttons
             buttons.Clear();
@@ -205,6 +206,11 @@ namespace Roleplay
             }
             return false;
         }
+        bool QueueResolved()
+        {
+            if(actionQueue.Count == 0) { return true; }
+            return false;
+        }
         public bool GetPressed(string name_)
         {
             bool b = false;
@@ -213,12 +219,18 @@ namespace Roleplay
         } //get news about the keys
         Creature GetActorAtPos(Point pos)
         {
-            foreach (Creature c in actors)
-            {
-                if (c.tsPos == pos) { return c; }
-            }
-            return null;
+            if (GetActorKey(pos) < actors.Count)
+                return (actors[GetActorKey(pos)]);
+            else return null;
         } //get actor at a specific location
+        int GetActorKey(Point pos)
+        {
+            for (int x = 0; x< actors.Count;x++)
+            {
+                if (actors[x].tsPos == pos) { return x; }
+            }
+            return actors.Count;
+        }
         public Creature CurrentActor()
         {
             return (actors[actorKey]);
@@ -395,6 +407,19 @@ namespace Roleplay
         }
 
         //game
+        void UpdateQueue()
+        {
+            actionActorKey = actionQueue[0].actorKey;
+            if (!actionLock)
+            {               
+                ApplyAction(actionQueue[0]);
+                actionLock = true;                
+            }
+            else if (actors[actionActorKey].ActionEnded())
+            {
+                NextAction();
+            }
+        }
         void UpdateGame(GameTime gt_)
         {
             UpdateTranslation();
@@ -402,6 +427,39 @@ namespace Roleplay
             if (GetPressed("zoom")) { zoom += 0.1f; }
             if (GetPressed("menu")) { gm = GameMode.Menus; SetupMenu(); }
 
+            if (QueueResolved())
+            {
+                if (CurrentActor().isPlayer)
+                {
+                    switch (gim)
+                    {
+                        case (GameInputMode.ActorMenu):
+                            break;
+                        case (GameInputMode.CastSkill):
+                            UpdateSkillCasting();
+                            break;
+                        case (GameInputMode.MoveActor):
+                            Move();
+                            break;
+                    }
+                }
+                else {
+                    Turn t = getBestOption();
+                    foreach(SingleAction sa in t.options)
+                    {
+                        actionQueue.Add(sa);
+                        ToggleNextActor();
+                    }
+                }
+                if (CurrentActor().AP == 0)
+                {
+                    ToggleNextActor();
+                }
+            }
+            else
+            {
+                UpdateQueue();
+            }
             PositionToTile(guy);
             PositionToTile(enemy);
 
@@ -411,27 +469,6 @@ namespace Roleplay
             }
 
             CheckButtons();
-
-            if (CurrentActor().isPlayer)
-            {
-                switch (gim)
-                {
-                    case (GameInputMode.ActorMenu):
-                        break;
-                    case (GameInputMode.CastSkill):
-                        UpdateSkillCasting();
-                        break;
-                    case (GameInputMode.MoveActor):
-                        Move();
-                        break;
-                }
-            }
-            else { ApplyTurn(getBestOption()); }
-
-            if(CurrentActor().maxAP == 0)
-            {               
-                ToggleNextActor();
-            }
         }
         void PositionToTile(Entity ent)
         {
@@ -443,22 +480,42 @@ namespace Roleplay
         //actor turn stuff
         void Move()
         {
-            if(GetActorAtPos(mouseTsPos()) == null)
+            
             if (IsleftClicking())
             {
                 if (IsMouseOnTile())
                 {
-                    Point p = mouseTsPos();
-                    Point x = p - CurrentActor().tsPos;
-                    int ap = Math.Abs(x.X) + Math.Abs(x.Y);
-                    if(ap <= CurrentActor().AP)
-                    {
-                        CurrentActor().AP -= ap;
-                        CurrentActor().tsPos = mouseTsPos();
-                        ToggleToActorMenu();
-                    }
+                    if (GetActorAtPos(mouseTsPos()) == null)
+                        if (CalcMoveAp(CurrentActor().tsPos, mouseTsPos()) <= CurrentActor().AP)
+                        {
+                            actionQueue.Add(new SingleAction(ActionType.Move, 0, mouseTsPos(), actorKey));
+                            ToggleToActorMenu();
+                        }
                 }
             }
+        }
+        int CalcMoveAp(Point actor_, Point loc_)
+        {
+            Point x = loc_ - actor_;
+            int ap = Math.Abs(x.X) + Math.Abs(x.Y);
+            return ap;
+        }
+        void CastMove(Point loc_, int akey_)
+        {
+            if(GetActorAtPos(loc_) == null)
+            {
+                int ap = CalcMoveAp(actors[akey_].tsPos, loc_);
+                if (ap <= actors[akey_].AP)
+                {
+                    actors[akey_].AP -= ap;
+                    actors[akey_].tsPos = mouseTsPos();
+                }
+            }
+        }
+        void NextAction()
+        {
+            actionQueue.RemoveAt(0);
+            actionLock = false;
         }
         void SelectSkill(int key)
         {
@@ -486,14 +543,18 @@ namespace Roleplay
                 buttons.Add(new Button(tex, new Vector2(920, 700), "MoveActor"));
             }
         } //adds or removes buttons based on the current actor
-        void CastSkill(int key, Point location)
+        void CastSkill(int key, Point location, int akey_)
         {
-            if(CurrentActor().AP >= CurrentActor().skills[key].AP)
+            if(actors[akey_].AP >= actors[akey_].skills[key].AP)
             {
-                CurrentActor().AP -= CurrentActor().skills[key].AP;
-
-                GetActorAtPos(location).hp -= CurrentActor().skills[key].damage;
-            }           
+                actors[akey_].AP -= actors[akey_].skills[key].AP;
+                actionQueue.Add(new SingleAction(actors[akey_].skills[key].damage, GetActorKey(location)));
+            }
+        }
+        void ApplyDamageAction(SingleAction sa_)
+        {
+            actors[sa_.actorKey].hp -= sa_.damage;
+            actors[sa_.actorKey].currentAction = ActionType.TakeDamage;
         }
         void UpdateActorMenu()
         {
@@ -510,7 +571,7 @@ namespace Roleplay
                     {
                         if (IsleftClicking())
                         {
-                            CastSkill(skillKey, actors[x].tsPos);
+                            actionQueue.Add(new SingleAction(ActionType.Skill, skillKey, mouseTsPos(), actorKey));
                             ToggleToActorMenu();
                         }
                     }
@@ -559,7 +620,7 @@ namespace Roleplay
         //AI
         public Turn getBestOption()
         {
-            Turn t = new Turn(new TurnOption[] { new TurnOption(OptionType.Move, 10, actors[actorKey].tsPos) });
+            Turn t = new Turn(new SingleAction[] { new SingleAction(ActionType.Move, 10, actors[actorKey].tsPos, actorKey) });
             int bestFitness = 0;
             for (int k = 0; k < CurrentActor().skills.Count; k++)
             {
@@ -572,25 +633,27 @@ namespace Roleplay
                     {
                         bestFitness = fitness;
 
-                        TurnOption option = new TurnOption(OptionType.Skill, k, c.tsPos);
-                        t = new Turn(new TurnOption[] { option });
+                        SingleAction option = new SingleAction(ActionType.Skill, k, c.tsPos, actorKey);
+                        t = new Turn(new SingleAction[] { option });
                     }
                 }
             }
             return t;
         }
-        void ApplyTurn(Turn turn_)
+        void ApplyAction(SingleAction sa_)
         {
-            foreach(TurnOption opt in turn_.options)
+            switch (sa_.type)
             {
-                switch (opt.type)
-                {
-                    case (OptionType.Skill):
-                        CastSkill(opt.key, opt.location);
-                        break;
-                }
+                case (ActionType.Skill):
+                    CastSkill(sa_.key, sa_.location, sa_.actorKey);
+                    break;
+                case (ActionType.Move):
+                    CastMove(sa_.location, sa_.actorKey);
+                    break;
+                case (ActionType.TakeDamage):
+                    ApplyDamageAction(sa_);
+                    break;
             }
-            ToggleNextActor();
         }     
 
         //menus

@@ -8,8 +8,8 @@ namespace Roleplay
 {
     public class Turn
     {
-        public TurnOption[] options;
-        public Turn(TurnOption[] options_)
+        public SingleAction[] options;
+        public Turn(SingleAction[] options_)
         {
             options = options_;
         }

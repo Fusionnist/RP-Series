@@ -23,6 +23,7 @@ namespace Roleplay
         public List<bool> isAnimated;
         public List<float> frameTime;
         public List<int> frameCount;
+        public List<AnimType> animTypes;
 
         public SpriteSheet(XDocument campaignDoc, ContentManager c_)
         {
@@ -40,6 +41,7 @@ namespace Roleplay
                 List<float> frameTimeL = new List<float>();
                 List<int> frameCountL = new List<int>();
                 List<int> srcKeysL = new List<int>();
+                List<AnimType> animTypeL = new List<AnimType>();
 
                 foreach (XElement tEl in tDoc.Element("Root").Elements("Textures"))
                 {
@@ -69,12 +71,14 @@ namespace Roleplay
                             isAnimatedL.Add(true);
                             frameTimeL.Add(int.Parse(ttEl.Attribute("ft").Value));
                             frameCountL.Add(int.Parse(ttEl.Attribute("fc").Value));
+                            animTypeL.Add((AnimType)int.Parse(ttEl.Attribute("at").Value));
                         }
                         else
                         {
                             isAnimatedL.Add(false);
                             frameTimeL.Add(0);
                             frameCountL.Add(1);
+                            animTypeL.Add(AnimType.Once);
                         }
                     }
                 }//gets and adds all tex values
@@ -88,6 +92,7 @@ namespace Roleplay
                 isAnimated = isAnimatedL;
                 frameTime = frameTimeL;
                 frameCount = frameCountL;
+                animTypes = animTypeL;
             }
 
             XDocument dDoc = XDocument.Load(campaignDoc.Element("Campaign").Element("Data").Attribute("path").Value);
@@ -228,7 +233,7 @@ namespace Roleplay
             {
                 if(ID_ == mTexIDs[i]) {
                     if (isAnimated[i])
-                        return new MagicTexture(getSourceTex(srcIDs[i]), sourceRects[i], facing[i], frameCount[i], frameTime[i], 0, mTexIDs[i]);
+                        return new MagicTexture(getSourceTex(srcIDs[i]), sourceRects[i], facing[i], frameCount[i], frameTime[i], 0, mTexIDs[i], animTypes[i]);
                     else
                         return new MagicTexture(getSourceTex(srcIDs[i]), sourceRects[i], facing[i], mTexIDs[i]);
                 }

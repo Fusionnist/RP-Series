@@ -63,7 +63,7 @@
     <Compile Include="Classes\Tileset.cs" />
     <Compile Include="Classes\TileSheet.cs" />
     <Compile Include="Classes\Turn.cs" />
-    <Compile Include="Classes\TurnOption.cs" />
+    <Compile Include="Classes\SingleAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
@@ -137,6 +137,7 @@
     </Content>
     <Content Include="Content\Xml\Data.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="_Memo.txt" />
     <Content Include="Content\cursor.png" />

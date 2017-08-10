@@ -32,6 +32,7 @@ namespace Roleplay
             sourceRect = sourceRect_;
             frame = sourceRect_;
             name = name_;
+            frameCount = 1;
             animType = AnimType.Once;
         }
         public MagicTexture(
@@ -64,7 +65,7 @@ namespace Roleplay
                     frameCounter = 0;
                 else if(animType == AnimType.Once)
                 {
-                    frameCounter = frameCount - 1;
+                    frameCounter = frameCount-1;
                     animCompleted = true;
                 }
             }
