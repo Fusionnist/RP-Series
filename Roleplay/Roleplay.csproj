@@ -46,6 +46,7 @@
     <Compile Include="Classes\Creature.cs" />
     <Compile Include="Classes\CreatureSheet.cs" />
     <Compile Include="Classes\Entity.cs" />
+    <Compile Include="Classes\Font.cs" />
     <Compile Include="Classes\FontDrawer.cs" />
     <Compile Include="Classes\FrameDrawer.cs" />
     <Compile Include="Classes\Game1.cs" />

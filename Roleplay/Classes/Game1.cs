@@ -527,11 +527,11 @@ namespace Roleplay
             //add or remove button
             for (int i = buttons.Count - 1; i >= 0; i--)
             {
-                if (buttons[i].action == "EndTurn") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
+                if (buttons[i].actionName == "EndTurn") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
 
-                if (buttons[i].action == "SelectSkill") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
+                if (buttons[i].actionName == "SelectSkill") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
 
-                if (buttons[i].action == "MoveActor") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
+                if (buttons[i].actionName == "MoveActor") { buttons.RemoveAt(i); if (buttons.Count <= 0) { break; } }
             }
             if (actors[actorKey].isPlayer)
             {
@@ -613,7 +613,7 @@ namespace Roleplay
             {
                 for (int i = buttons.Count - 1; i >= 0; i--)
                 {
-                    if (buttons[i].action == "SelectSkillKey") { buttons.RemoveAt(i); }
+                    if (buttons[i].actionName == "SelectSkillKey") { buttons.RemoveAt(i); }
                 }
             }
         }
@@ -884,7 +884,7 @@ namespace Roleplay
             {
                 if(buttons[i].getFrame(false).Contains(mousePos) && IsleftClicking())
                 {
-                    switch (buttons[i].action)
+                    switch (buttons[i].actionName)
                     {
                         case ("TilesetEditor"):                           
                             gm = GameMode.TilesetEditor; SetupTSE();

@@ -2,7 +2,7 @@
 
 namespace Roleplay
 {
-    public class CreatureSheet
+    public class CreatureSheet //holds creature constructor data
     {
         public List<int> maxap;
         public List<int> maxhp;

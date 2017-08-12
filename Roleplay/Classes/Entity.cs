@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Roleplay
 {
-    public class Entity:Sprite
+    public class Entity:Sprite //sprite + tileset presence
     {
         public Point tsPos;
         public int ID;

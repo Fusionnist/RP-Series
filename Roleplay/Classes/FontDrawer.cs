@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Roleplay
 {
-    public class FontDrawer
+    public class FontDrawer //draws custom fonts
     {
         Texture2D src;
         int charWidth, charHeight;

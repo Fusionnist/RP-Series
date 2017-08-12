@@ -227,6 +227,20 @@ namespace Roleplay
             }
             return null;
         }
+        public Item getItem(int ID_)
+        {
+            for (int x = 0; x < iSheet.IDs.Count; x++)
+            {
+                if (iSheet.IDs[x] == ID_)
+                {
+                    return new Item(
+                        getTex(iSheet.iconIDs[x]),
+                        ID_,
+                        iSheet.names[x]);
+                }
+            }
+            return null;
+        }
         public MagicTexture getTex(int ID_)
         {
             for(int i = 0; i < mTexIDs.Count; i++)

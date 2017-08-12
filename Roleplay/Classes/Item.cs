@@ -11,7 +11,7 @@ namespace Roleplay
 {
     public enum ItemType { Consumable, Material, Weapon };
 
-    class Item
+    public class Item
     {
         public int ID;
         public string name { get; set; }
