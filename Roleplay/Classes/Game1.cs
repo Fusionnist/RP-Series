@@ -109,7 +109,7 @@ namespace Roleplay
             buttons = new List<Button>();
             
             string str = "abcdefghijklmnopqrstuvwxyz0123456789.!?,':;() ";
-            fDrawer = new FontDrawer(Content.Load<Texture2D>("font"), 80, 100, str);
+            fDrawer = new FontDrawer(LoadFont());
 
             overlay = new MagicTexture(Content.Load<Texture2D>("overlay"), new Rectangle(0, 0, 200, 100), Facing.N, 0);
 
@@ -355,6 +355,29 @@ namespace Roleplay
             return actorsInRange.ToArray();
         }
 
+        public Font LoadFont() //loads the testfont rn
+        {
+            XDocument doc = XDocument.Load("Content/Xml/Data.xml");
+            List<char[]> chars = new List<char[]>();
+            List<Rectangle> recs = new List<Rectangle>();
+            Texture2D src = Content.Load<Texture2D>(doc.Element("Data").Element("Fonts").Element("Font").Attribute("src").Value);
+            foreach(XElement c in doc.Element("Data").Element("Fonts").Element("Font").Element("Chars").Elements("Char"))
+            {
+                recs.Add(new Rectangle(
+                    int.Parse(c.Attribute("x").Value),
+                    int.Parse(c.Attribute("y").Value),
+                    int.Parse(c.Attribute("w").Value),
+                    int.Parse(c.Attribute("h").Value)));
+
+                List<char> cs = new List<char>();
+                foreach(XElement id in c.Elements("ID"))
+                {
+                    cs.Add(char.Parse(id.Value));
+                }
+                chars.Add(cs.ToArray());
+            }
+            return new Font(src, chars.ToArray(), recs.ToArray());
+        }
         //save
         public void SaveTileset()
         {

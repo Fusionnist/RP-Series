@@ -63,4 +63,114 @@
       <Type>2</Type>
     </Item>
   </Items>
+  <Fonts>
+    <Font name="testfont" src="font">
+      <Chars>
+        <Char x="0" y="0" w="80" h="100">
+          <ID>a</ID>
+          <ID>A</ID>
+        </Char>
+      <Char x="80" y="0" w="80" h="100">
+          <ID>b</ID>
+          <ID>B</ID>
+        </Char>
+      <Char x="160" y="0" w="80" h="100">
+          <ID>c</ID>
+          <ID>C</ID>
+        </Char>
+      <Char x="240" y="0" w="80" h="100">
+          <ID>d</ID>
+          <ID>D</ID>
+        </Char>
+      <Char x="320" y="0" w="80" h="100">
+          <ID>e</ID>
+          <ID>E</ID>
+        </Char>
+      <Char x="400" y="0" w="80" h="100">
+          <ID>F</ID>
+          <ID>f</ID>
+        </Char>
+      <Char x="480" y="0" w="80" h="100">
+          <ID>g</ID>
+          <ID>G</ID>
+        </Char>
+      <Char x="560" y="0" w="80" h="100">
+          <ID>h</ID>
+          <ID>H</ID>
+        </Char>
+      <Char x="640" y="0" w="80" h="100">
+          <ID>i</ID>
+          <ID>I</ID>
+        </Char>
+      <Char x="720" y="0" w="80" h="100">
+          <ID>j</ID>
+          <ID>J</ID>
+        </Char>
+      <Char x="0" y="100" w="80" h="100">
+          <ID>k</ID>
+          <ID>K</ID>
+        </Char>
+      <Char x="80" y="100" w="80" h="100">
+          <ID>l</ID>
+          <ID>L</ID>
+        </Char>
+      <Char x="160" y="100" w="80" h="100">
+          <ID>m</ID>
+          <ID>M</ID>
+        </Char>
+      <Char x="240" y="100" w="80" h="100">
+          <ID>n</ID>
+          <ID>N</ID>
+        </Char>
+      <Char x="320" y="100" w="80" h="100">
+          <ID>o</ID>
+          <ID>O</ID>
+        </Char>
+      <Char x="400" y="100" w="80" h="100">
+          <ID>p</ID>
+          <ID>P</ID>
+        </Char>
+      <Char x="480" y="100" w="80" h="100">
+          <ID>q</ID>
+          <ID>Q</ID>
+        </Char>
+      <Char x="560" y="100" w="80" h="100">
+          <ID>r</ID>
+          <ID>R</ID>
+        </Char>
+      <Char x="640" y="100" w="80" h="100">
+          <ID>s</ID>
+          <ID>S</ID>
+        </Char>
+      <Char x="720" y="100" w="80" h="100">
+          <ID>t</ID>
+          <ID>T</ID>
+        </Char>
+      <Char x="0" y="200" w="80" h="100">
+          <ID>u</ID>
+          <ID>U</ID>
+        </Char>
+      <Char x="80" y="200" w="80" h="100">
+          <ID>v</ID>
+          <ID>V</ID>
+        </Char>
+      <Char x="160" y="200" w="80" h="100">
+          <ID>w</ID>
+          <ID>W</ID>
+        </Char>
+      <Char x="240" y="200" w="80" h="100">
+          <ID>x</ID>
+          <ID>X</ID>
+        </Char>
+      <Char x="320" y="200" w="80" h="100">
+          <ID>y</ID>
+          <ID>Y</ID>
+        </Char>
+      <Char x="400" y="200" w="80" h="100">
+          <ID>z</ID>
+          <ID>Z</ID>
+        </Char>
+      </Chars>
+    </Font>
+  </Fonts>
 </Data>
